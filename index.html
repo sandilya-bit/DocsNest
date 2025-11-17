@@ -51,28 +51,6 @@
     @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.5;} }
     @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
 
-    /* GitHub Banner */
-    .github-banner {
-      background: linear-gradient(90deg, #24292e, #161b22);
-      color: white;
-      padding: 0.5rem 1rem;
-      font-size: 0.8rem;
-      text-align: center;
-      border-bottom: 1px solid var(--primary-purple);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-    }
-    .github-banner a {
-      color: var(--light-purple);
-      text-decoration: none;
-      font-weight: 500;
-    }
-    .github-banner a:hover {
-      text-decoration: underline;
-    }
-
     /* Login */
     .login-container {
       display: flex; justify-content: center; align-items: center;
@@ -1106,13 +1084,6 @@
 </head>
 <body>
 
-  <!-- GITHUB BANNER -->
-  <div class="github-banner">
-    <i class="fab fa-github"></i>
-    <span>GitHub Pages Demo - Data stored locally in browser</span>
-    <a href="https://github.com" target="_blank">View Source</a>
-  </div>
-
   <!-- LOADING SCREEN -->
   <div id="loadingScreen" class="loading-screen">
     <div class="loading-text">DocsNest</div>
@@ -1462,7 +1433,7 @@ window.onload = async () => {
   // Initialize IndexedDB
   await initDB();
   
-  // Load files from localStorage - CRITICAL FOR GITHUB PAGES
+  // Load files from localStorage
   loadFilesFromStorage();
   
   setTimeout(() => {
@@ -1512,15 +1483,12 @@ function toggleMobileSidebar() {
   }
 }
 
-// Storage functions - ENHANCED FOR GITHUB PAGES
+// Storage functions
 function loadFilesFromStorage() {
-  // Try to load from localStorage first
   const storedFiles = localStorage.getItem('docsNestFiles');
   if (storedFiles) {
     try {
       const parsedFiles = JSON.parse(storedFiles);
-      console.log('Loaded files from localStorage:', parsedFiles);
-      
       // Merge with default files - make uploaded files visible to all users
       Object.keys(parsedFiles).forEach(subject => {
         if (mockFiles[subject]) {
@@ -1529,67 +1497,11 @@ function loadFilesFromStorage() {
           mockFiles[subject] = parsedFiles[subject];
         }
       });
-      
-      // Recreate blob URLs for uploaded files - CRITICAL FOR GITHUB PAGES
-      recreateBlobURLs(parsedFiles);
-      
     } catch (e) {
       console.error('Error loading files from storage:', e);
     }
-  } else {
-    // For GitHub Pages, try to load from session storage as fallback
-    const sessionFiles = sessionStorage.getItem('docsNestFiles');
-    if (sessionFiles) {
-      try {
-        const parsedFiles = JSON.parse(sessionFiles);
-        console.log('Loaded files from sessionStorage:', parsedFiles);
-        
-        Object.keys(parsedFiles).forEach(subject => {
-          if (mockFiles[subject]) {
-            mockFiles[subject] = [...mockFiles[subject], ...parsedFiles[subject]];
-          } else {
-            mockFiles[subject] = parsedFiles[subject];
-          }
-        });
-        
-        // Recreate blob URLs for uploaded files
-        recreateBlobURLs(parsedFiles);
-        
-      } catch (e) {
-        console.error('Error loading files from sessionStorage:', e);
-      }
-    }
   }
-  
   updateStorageInfo();
-}
-
-// CRITICAL FUNCTION FOR GITHUB PAGES - Recreate blob URLs
-async function recreateBlobURLs(files) {
-  for (const subject in files) {
-    for (const file of files[subject]) {
-      if (file.isLocal && file.id && !file.path) {
-        try {
-          const storedFile = await getFileFromDB(file.id);
-          if (storedFile && storedFile.data) {
-            // Create blob URL from stored data
-            const byteCharacters = atob(storedFile.data.split(',')[1]);
-            const byteNumbers = new Array(byteCharacters.length);
-            for (let i = 0; i < byteCharacters.length; i++) {
-              byteNumbers[i] = byteCharacters.charCodeAt(i);
-            }
-            const byteArray = new Uint8Array(byteNumbers);
-            const blob = new Blob([byteArray], { type: storedFile.mimeType });
-            file.path = URL.createObjectURL(blob);
-            
-            console.log(`Recreated blob URL for ${file.name}:`, file.path);
-          }
-        } catch (e) {
-          console.error('Error recreating blob URL for file:', file.name, e);
-        }
-      }
-    }
-  }
 }
 
 function saveFilesToStorage() {
@@ -1601,14 +1513,7 @@ function saveFilesToStorage() {
       localFiles[subject] = uploaded;
     }
   });
-  
-  const filesToStore = JSON.stringify(localFiles);
-  localStorage.setItem('docsNestFiles', filesToStore);
-  
-  // Also save to sessionStorage for GitHub Pages compatibility
-  sessionStorage.setItem('docsNestFiles', filesToStore);
-  
-  console.log('Saved files to storage:', localFiles);
+  localStorage.setItem('docsNestFiles', JSON.stringify(localFiles));
   updateStorageInfo();
 }
 
@@ -1653,9 +1558,6 @@ function clearAllStorage() {
   if (confirm('Are you sure you want to clear all uploaded files? This action cannot be undone.')) {
     // Clear localStorage
     localStorage.removeItem('docsNestFiles');
-    
-    // Clear sessionStorage
-    sessionStorage.removeItem('docsNestFiles');
     
     // Clear IndexedDB
     if (db) {
@@ -1906,7 +1808,7 @@ async function uploadFile(){
     try {
       await storeFileInDB(newFile);
       
-      // Create blob URL for immediate use - CRITICAL FOR GITHUB PAGES
+      // Create blob URL for immediate use
       const blob = new Blob([file], { type: file.type });
       newFile.path = URL.createObjectURL(blob);
       
@@ -1916,6 +1818,650 @@ async function uploadFile(){
       }
       
       mockFiles[currentSubject].push(newFile);
-      
-      // Save to both localStorage and sessionStorage - CRITICAL FOR GITHUB PAGES
       saveFilesToStorage();
+      loadSubject(currentSubject);
+      closeUploadModal();
+      
+      // Reset form
+      document.getElementById('fileNameInput').value = '';
+      document.getElementById('fileInput').value = '';
+      
+      showToast('File uploaded successfully!', 'success');
+    } catch (error) {
+      console.error('Error storing file:', error);
+      showToast('Error uploading file. Please try again.', 'error');
+    }
+  };
+  
+  reader.readAsDataURL(file);
+}
+
+async function viewFile(file){
+  currentFile = file;
+  
+  // If it's a local file, retrieve from IndexedDB if needed
+  if (file.isLocal && file.id && !file.path) {
+    try {
+      const storedFile = await getFileFromDB(file.id);
+      if (storedFile && storedFile.data) {
+        // Create blob URL from stored data
+        const byteCharacters = atob(storedFile.data.split(',')[1]);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: storedFile.mimeType });
+        file.path = URL.createObjectURL(blob);
+      }
+    } catch (e) {
+      console.error('Error retrieving file:', e);
+    }
+  }
+  
+  let viewerContent = '<div class="file-preview">';
+  
+  // File information section
+  viewerContent += `
+    <div class="file-info">
+      <h3><i class="${getFileIcon(file.type)}"></i> ${file.name}</h3>
+      <p><strong>Type:</strong> ${file.type}</p>
+      <p><strong>Category:</strong> ${file.nested}</p>
+      <p><strong>Date:</strong> ${file.date}</p>
+      ${file.size ? `<p><strong>Size:</strong> ${formatFileSize(file.size)}</p>` : ''}
+      ${file.isLocal ? '<p><strong>Storage:</strong> <span style="color: var(--success-green);">Local Storage</span></p>' : ''}
+    </div>
+  `;
+  
+  // Preview section
+  viewerContent += '<div class="preview-container">';
+  
+  if(file.path) {
+    const fileType = file.type.toLowerCase();
+    
+    if(fileType === 'pdf') {
+      viewerContent += `<embed src="${file.path}" width="100%" height="100%" type="application/pdf">`;
+      // Show PDF reader for PDF files
+      showPDFReader(file);
+    }
+    else if(['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(fileType)) {
+      viewerContent += `<img src="${file.path}" alt="${file.name}">`;
+      hidePDFReader();
+    }
+    else if(['mp4', 'webm', 'ogg'].includes(fileType)) {
+      viewerContent += `
+        <video controls width="100%" height="100%">
+          <source src="${file.path}" type="video/${fileType}">
+          Your browser does not support video tag.
+        </video>
+      `;
+      hidePDFReader();
+    }
+    else if(['mp3', 'wav', 'ogg'].includes(fileType)) {
+      viewerContent += `
+        <div style="text-align: center; width: 100%;">
+          <i class="fas fa-file-audio" style="font-size: 3rem; color: var(--light-purple); margin-bottom: 0.75rem;"></i>
+          <p style="margin-bottom: 0.75rem;">Audio File: ${file.name}</p>
+          <audio controls style="width: 80%;">
+            <source src="${file.path}" type="audio/${fileType}">
+            Your browser does not support audio element.
+          </audio>
+        </div>
+      `;
+      hidePDFReader();
+    }
+    else if(['txt', 'md'].includes(fileType)) {
+      viewerContent += `
+        <iframe src="${file.path}" width="100%" height="100%" style="background: white; color: black; padding: 0.75rem;">
+        </iframe>
+      `;
+      hidePDFReader();
+    }
+    else if(['html', 'htm'].includes(fileType)) {
+      viewerContent += `<iframe src="${file.path}" width="100%" height="100%"></iframe>`;
+      hidePDFReader();
+    }
+    else {
+      viewerContent += `
+        <div class="no-preview">
+          <i class="${getFileIcon(fileType)}"></i>
+          <p>Preview not available for this file type</p>
+          <p style="font-size: 0.8rem; opacity: 0.7;">File type: ${fileType}</p>
+        </div>
+      `;
+      hidePDFReader();
+    }
+  } else {
+    viewerContent += `
+      <div class="no-preview">
+        <i class="fas fa-file"></i>
+        <p>No preview available</p>
+      </div>
+    `;
+    hidePDFReader();
+  }
+  
+  viewerContent += '</div>';
+  
+  // Action buttons
+  viewerContent += '<div class="action-buttons">';
+  
+  // Download button for uploaded files
+  if(file.isLocal) {
+    viewerContent += `
+      <button class="download-btn" onclick="downloadLocalFile('${file.id}', '${file.name}')">
+        <i class="fas fa-download"></i> Download
+      </button>
+    `;
+  }
+  
+  // Fullscreen button
+  if(file.path) {
+    viewerContent += `
+      <button class="fullscreen-btn" onclick="openFullscreen()">
+        <i class="fas fa-expand"></i> Fullscreen
+      </button>
+    `;
+  }
+  
+  viewerContent += '</div>';
+  viewerContent += '</div>';
+  
+  // Update both desktop and mobile viewers
+  document.getElementById('docNestViewer').innerHTML = viewerContent;
+  document.getElementById('mobileDocNestViewer').innerHTML = viewerContent;
+  
+  // Show/hide fullscreen buttons
+  if(file.path) {
+    document.getElementById('fullscreenToggleBtn').style.display = 'inline-flex';
+    document.getElementById('mobileFullscreenToggleBtn').style.display = 'inline-flex';
+  } else {
+    document.getElementById('fullscreenToggleBtn').style.display = 'none';
+    document.getElementById('mobileFullscreenToggleBtn').style.display = 'none';
+  }
+}
+
+// PDF Reader Functions
+function showPDFReader(file) {
+  const pdfReader = document.getElementById('pdfReader');
+  const mobilePdfReader = document.getElementById('mobilePdfReader');
+  const pdfViewer = document.getElementById('pdfViewer');
+  const mobilePdfViewer = document.getElementById('mobilePdfViewer');
+  const pdfLoading = document.getElementById('pdfLoading');
+  const mobilePdfLoading = document.getElementById('mobilePdfLoading');
+  
+  pdfReader.classList.add('active');
+  mobilePdfReader.classList.add('active');
+  pdfLoading.style.display = 'block';
+  mobilePdfLoading.style.display = 'block';
+  pdfViewer.style.display = 'none';
+  mobilePdfViewer.style.display = 'none';
+  
+  // Set PDF source with parameters for better viewing
+  const pdfSrc = `${file.path}#toolbar=0&navpanes=0&scrollbar=0`;
+  pdfViewer.src = pdfSrc;
+  mobilePdfViewer.src = pdfSrc;
+  
+  // Simulate page count (in real implementation, you'd use PDF.js to get actual page count)
+  document.getElementById('pdfTotalPages').textContent = '10';
+  document.getElementById('mobilePdfTotalPages').textContent = '10';
+  document.getElementById('pdfPageInput').value = '1';
+  document.getElementById('mobilePdfPageInput').value = '1';
+  document.getElementById('pdfPageInput').max = '10';
+  document.getElementById('mobilePdfPageInput').max = '10';
+  
+  // Update buttons
+  updatePDFNavigationButtons();
+  
+  // Hide loading after a delay
+  setTimeout(() => {
+    pdfLoading.style.display = 'none';
+    mobilePdfLoading.style.display = 'none';
+    pdfViewer.style.display = 'block';
+    mobilePdfViewer.style.display = 'block';
+  }, 1500);
+}
+
+function hidePDFReader() {
+  document.getElementById('pdfReader').classList.remove('active');
+  document.getElementById('mobilePdfReader').classList.remove('active');
+}
+
+function previousPDFPage() {
+  const currentPage = parseInt(document.getElementById('pdfPageInput').value);
+  const mobileCurrentPage = parseInt(document.getElementById('mobilePdfPageInput').value);
+  if (currentPage > 1) {
+    document.getElementById('pdfPageInput').value = currentPage - 1;
+    document.getElementById('mobilePdfPageInput').value = mobileCurrentPage - 1;
+    goToPDFPage();
+  }
+}
+
+function nextPDFPage() {
+  const currentPage = parseInt(document.getElementById('pdfPageInput').value);
+  const mobileCurrentPage = parseInt(document.getElementById('mobilePdfPageInput').value);
+  const totalPages = parseInt(document.getElementById('pdfTotalPages').textContent);
+  if (currentPage < totalPages) {
+    document.getElementById('pdfPageInput').value = currentPage + 1;
+    document.getElementById('mobilePdfPageInput').value = mobileCurrentPage + 1;
+    goToPDFPage();
+  }
+}
+
+function goToPDFPage() {
+  const page = parseInt(document.getElementById('pdfPageInput').value);
+  const mobilePage = parseInt(document.getElementById('mobilePdfPageInput').value);
+  const totalPages = parseInt(document.getElementById('pdfTotalPages').textContent);
+  
+  if (page >= 1 && page <= totalPages) {
+    const pdfViewer = document.getElementById('pdfViewer');
+    const mobilePdfViewer = document.getElementById('mobilePdfViewer');
+    const currentSrc = pdfViewer.src.split('#')[0];
+    pdfViewer.src = `${currentSrc}#page=${page}&toolbar=0&navpanes=0&scrollbar=0`;
+    mobilePdfViewer.src = `${currentSrc}#page=${page}&toolbar=0&navpanes=0&scrollbar=0`;
+    updatePDFNavigationButtons();
+  }
+}
+
+function updatePDFNavigationButtons() {
+  const currentPage = parseInt(document.getElementById('pdfPageInput').value);
+  const totalPages = parseInt(document.getElementById('pdfTotalPages').textContent);
+  
+  document.getElementById('pdfPrevBtn').disabled = currentPage <= 1;
+  document.getElementById('pdfNextBtn').disabled = currentPage >= totalPages;
+  document.getElementById('mobilePdfPrevBtn').disabled = currentPage <= 1;
+  document.getElementById('mobilePdfNextBtn').disabled = currentPage >= totalPages;
+}
+
+function changePDFZoom() {
+  const zoom = document.getElementById('pdfZoomSelect').value;
+  const mobileZoom = document.getElementById('mobilePdfZoomSelect').value;
+  const pdfViewer = document.getElementById('pdfViewer');
+  const mobilePdfViewer = document.getElementById('mobilePdfViewer');
+  const currentSrc = pdfViewer.src.split('#')[0];
+  const currentPage = document.getElementById('pdfPageInput').value;
+  
+  pdfViewer.src = `${currentSrc}#page=${currentPage}&zoom=${zoom}&toolbar=0&navpanes=0&scrollbar=0`;
+  mobilePdfViewer.src = `${currentSrc}#page=${currentPage}&zoom=${mobileZoom}&toolbar=0&navpanes=0&scrollbar=0`;
+}
+
+function rotatePDF() {
+  currentPDFRotation = (currentPDFRotation + 90) % 360;
+  const pdfViewer = document.getElementById('pdfViewer');
+  const mobilePdfViewer = document.getElementById('mobilePdfViewer');
+  pdfViewer.style.transform = `rotate(${currentPDFRotation}deg)`;
+  mobilePdfViewer.style.transform = `rotate(${currentPDFRotation}deg)`;
+}
+
+function downloadPDF() {
+  if (currentFile && currentFile.isLocal) {
+    downloadLocalFile(currentFile.id, currentFile.name);
+  } else if (currentFile && currentFile.path) {
+    // For non-local PDFs, create a download link
+    const a = document.createElement('a');
+    a.href = currentFile.path;
+    a.download = currentFile.name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    showToast('Download started', 'success');
+  }
+}
+
+async function downloadLocalFile(fileId, fileName) {
+  try {
+    const storedFile = await getFileFromDB(fileId);
+    if (storedFile && storedFile.data) {
+      const a = document.createElement('a');
+      a.href = storedFile.data;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      showToast('Download started', 'success');
+    }
+  } catch (e) {
+    console.error('Error downloading file:', e);
+    showToast('Error downloading file', 'error');
+  }
+}
+
+function openFullscreen() {
+  if (!currentFile || !currentFile.path) return;
+  
+  const modal = document.getElementById('fullscreenModal');
+  const content = document.getElementById('fullscreenContent');
+  const fileName = document.getElementById('fullscreenFileName');
+  const fileIcon = document.getElementById('fullscreenFileIcon');
+  
+  // Set file info
+  fileName.textContent = currentFile.name;
+  fileIcon.className = getFileIcon(currentFile.type);
+  
+  // Reset zoom
+  currentZoom = 100;
+  updateZoomLevel();
+  
+  // Load content based on file type
+  const fileType = currentFile.type.toLowerCase();
+  content.innerHTML = '';
+  
+  if(fileType === 'pdf') {
+    content.innerHTML = `<embed id="fullscreenEmbed" src="${currentFile.path}" type="application/pdf" style="width: 100%; height: 100%;">`;
+    document.getElementById('pageNavigation').style.display = 'flex';
+    document.getElementById('zoomControls').style.display = 'flex';
+  }
+  else if(['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(fileType)) {
+    content.innerHTML = `<img id="fullscreenImage" src="${currentFile.path}" alt="${currentFile.name}" style="transform: scale(1); transition: transform 0.3s ease;">`;
+    document.getElementById('pageNavigation').style.display = 'none';
+    document.getElementById('zoomControls').style.display = 'flex';
+  }
+  else if(['mp4', 'webm', 'ogg'].includes(fileType)) {
+    content.innerHTML = `
+      <video id="fullscreenVideo" controls style="width: 100%; height: 100%;">
+        <source src="${currentFile.path}" type="video/${fileType}">
+        Your browser does not support video tag.
+      </video>
+    `;
+    document.getElementById('pageNavigation').style.display = 'none';
+    document.getElementById('zoomControls').style.display = 'none';
+  }
+  else if(['mp3', 'wav', 'ogg'].includes(fileType)) {
+    content.innerHTML = `
+      <div style="text-align: center; width: 100%;">
+        <i class="fas fa-file-audio" style="font-size: 4rem; color: var(--light-purple); margin-bottom: 1.5rem;"></i>
+        <h2 style="color: var(--light-purple); margin-bottom: 1.5rem;">${currentFile.name}</h2>
+        <audio controls style="width: 80%; max-width: 400px;">
+          <source src="${currentFile.path}" type="audio/${fileType}">
+          Your browser does not support audio element.
+        </audio>
+      </div>
+    `;
+    document.getElementById('pageNavigation').style.display = 'none';
+    document.getElementById('zoomControls').style.display = 'none';
+  }
+  else if(['txt', 'md', 'html', 'htm'].includes(fileType)) {
+    content.innerHTML = `<iframe id="fullscreenIframe" src="${currentFile.path}" style="width: 100%; height: 100%; background: white;"></iframe>`;
+    document.getElementById('pageNavigation').style.display = 'none';
+    document.getElementById('zoomControls').style.display = 'flex';
+  }
+  else {
+    content.innerHTML = `
+      <div class="no-preview">
+        <i class="${getFileIcon(fileType)}" style="font-size: 4rem;"></i>
+        <h2>${currentFile.name}</h2>
+        <p>Cannot preview this file type in fullscreen</p>
+        <p style="font-size: 0.9rem; opacity: 0.7;">File type: ${fileType}</p>
+      </div>
+    `;
+    document.getElementById('pageNavigation').style.display = 'none';
+    document.getElementById('zoomControls').style.display = 'none';
+  }
+  
+  // Show modal
+  modal.classList.add('active');
+  
+  // Try to enter browser fullscreen
+  if (modal.requestFullscreen) {
+    modal.requestFullscreen();
+  } else if (modal.webkitRequestFullscreen) { /* Safari */
+    modal.webkitRequestFullscreen();
+  } else if (modal.msRequestFullscreen) { /* IE11 */
+    modal.msRequestFullscreen();
+  }
+}
+
+function closeFullscreen() {
+  const modal = document.getElementById('fullscreenModal');
+  modal.classList.remove('active');
+  
+  // Exit browser fullscreen
+  if (document.exitFullscreen) {
+    document.exitFullscreen();
+  } else if (document.webkitExitFullscreen) { /* Safari */
+    document.webkitExitFullscreen();
+  } else if (document.msExitFullscreen) { /* IE11 */
+    document.msExitFullscreen();
+  }
+}
+
+function toggleFullscreen() {
+  if (document.fullscreenElement) {
+    closeFullscreen();
+  } else {
+    openFullscreen();
+  }
+}
+
+function zoomIn() {
+  if (currentZoom < 200) {
+    currentZoom += 25;
+    applyZoom();
+  }
+}
+
+function zoomOut() {
+  if (currentZoom > 25) {
+    currentZoom -= 25;
+    applyZoom();
+  }
+}
+
+function resetZoom() {
+  currentZoom = 100;
+  applyZoom();
+}
+
+function updateZoomLevel() {
+  document.getElementById('zoomLevel').textContent = currentZoom + '%';
+}
+
+function applyZoom() {
+  updateZoomLevel();
+  const scale = currentZoom / 100;
+  
+  const image = document.getElementById('fullscreenImage');
+  if (image) {
+    image.style.transform = `scale(${scale})`;
+  }
+  
+  const embed = document.getElementById('fullscreenEmbed');
+  if (embed) {
+    embed.style.transform = `scale(${scale})`;
+    embed.style.transformOrigin = 'center center';
+  }
+  
+  const iframe = document.getElementById('fullscreenIframe');
+  if (iframe) {
+    iframe.style.transform = `scale(${scale})`;
+    iframe.style.transformOrigin = 'center center';
+  }
+}
+
+function previousPage() {
+  if (currentPage > 1) {
+    currentPage--;
+    document.getElementById('currentPage').textContent = currentPage;
+    // Note: Actual PDF page navigation would require PDF.js integration
+  }
+}
+
+function nextPage() {
+  if (currentPage < totalPages) {
+    currentPage++;
+    document.getElementById('currentPage').textContent = currentPage;
+    // Note: Actual PDF page navigation would require PDF.php integration
+  }
+}
+
+function formatFileSize(bytes) {
+  if(bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+function downloadFile(fileName, fileUrl) {
+  const a = document.createElement('a');
+  a.href = fileUrl;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+function searchFiles() {
+  const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+  
+  if(!currentSubject) return;
+  
+  const files = mockFiles[currentSubject] || [];
+  const desktopGrid = document.getElementById('fileGrid');
+  const mobileGrid = document.getElementById('mobileFileGrid');
+  
+  desktopGrid.innerHTML = '';
+  mobileGrid.innerHTML = '';
+  
+  const filteredFiles = files.filter(file => 
+    file.name.toLowerCase().includes(searchTerm) || 
+    file.nested.toLowerCase().includes(searchTerm)
+  );
+  
+  if(filteredFiles.length === 0) {
+    const noResults = '<p style="opacity: 0.7; grid-column: 1/-1;">No files found matching your search.</p>';
+    desktopGrid.innerHTML = noResults;
+    mobileGrid.innerHTML = noResults;
+    return;
+  }
+  
+  filteredFiles.forEach((file, index) => {
+    const originalIndex = files.indexOf(file);
+    
+    const createFileCard = (grid) => {
+      const card = document.createElement('div');
+      card.className = 'file-card';
+
+      // Add local indicator for uploaded files
+      if (file.isLocal) {
+        const indicator = document.createElement('div');
+        indicator.className = 'local-indicator';
+        indicator.textContent = 'LOCAL';
+        card.appendChild(indicator);
+      }
+
+      const trash = document.createElement('span');
+      trash.className = 'delete-icon';
+      trash.innerHTML = "<i class='fas fa-trash'></i>";
+      trash.onclick = (e) => {
+        e.stopPropagation();
+        deleteFile(originalIndex);
+      };
+
+      card.innerHTML = `
+        <div class="file-icon">
+          <i class="${getFileIcon(file.type)}"></i>
+        </div>
+        <h3>${file.name}</h3>
+        <p>Type: ${file.type}</p>
+        <p>Category: ${file.nested}</p>
+        <p class="file-date">Date: ${file.date}</p>
+      `;
+      
+      // Only show delete icon for admin
+      if(currentUser === 'admin') card.appendChild(trash);
+
+      card.onclick = () => viewFile(file);
+      grid.appendChild(card);
+    };
+    
+    createFileCard(desktopGrid);
+    createFileCard(mobileGrid);
+  });
+}
+
+function openUploadModal(){ 
+  if(!currentSubject) {
+    showToast("Please select a subject first", 'warning');
+    return;
+  }
+  document.getElementById('uploadModal').style.display="flex";
+}
+
+function closeUploadModal(){
+  document.getElementById('uploadModal').style.display="none";
+}
+
+function openAddSubjectModal() {
+  document.getElementById('addSubjectModal').style.display="flex";
+}
+
+function closeAddSubjectModal() {
+  document.getElementById('addSubjectModal').style.display="none";
+}
+
+function addSubject() {
+  const subjectName = document.getElementById('subjectNameInput').value.trim();
+  if(!subjectName) {
+    showToast("Please enter a subject name", 'error');
+    return;
+  }
+  
+  // Convert to lowercase and replace spaces with hyphens for key
+  const subjectKey = subjectName.toLowerCase().replace(/\s+/g, '-');
+  
+  if(mockFiles[subjectKey]) {
+    showToast("Subject already exists", 'warning');
+    return;
+  }
+  
+  mockFiles[subjectKey] = [];
+  saveFilesToStorage();
+  renderSubjects();
+  closeAddSubjectModal();
+  
+  // Reset form
+  document.getElementById('subjectNameInput').value = '';
+  
+  // Load newly added subject
+  loadSubject(subjectKey);
+  showToast('Subject added successfully', 'success');
+}
+
+function removeSubject() {
+  if(!currentSubject) {
+    showToast("Please select a subject first", 'warning');
+    return;
+  }
+  
+  if(confirm(`Are you sure you want to remove the subject "${currentSubject.replace(/-/g, ' ').toUpperCase()}" and all its files?`)) {
+    // Delete local files from IndexedDB
+    const filesToDelete = mockFiles[currentSubject].filter(file => file.isLocal);
+    filesToDelete.forEach(async file => {
+      if (file.id) {
+        try {
+          await deleteFileFromDB(file.id);
+        } catch (e) {
+          console.error('Error deleting file from DB:', e);
+        }
+      }
+    });
+    
+    delete mockFiles[currentSubject];
+    currentSubject = null;
+    saveFilesToStorage();
+    renderSubjects();
+    document.getElementById('subjectTitle').textContent = 'Select a Subject';
+    document.getElementById('mobileSubjectTitle').textContent = 'Select a Subject';
+    document.getElementById('fileGrid').innerHTML = '';
+    document.getElementById('mobileFileGrid').innerHTML = '';
+    document.getElementById('docNestViewer').innerHTML = 'Select a file to preview details here.';
+    document.getElementById('mobileDocNestViewer').innerHTML = 'Select a file to preview details here.';
+    hidePDFReader();
+    showToast('Subject removed successfully', 'success');
+  }
+}
+
+</script>
+</body>
+</html>
