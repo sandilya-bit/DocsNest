@@ -115,41 +115,43 @@
     header {
       background: var(--black);
       border-bottom: 2px solid var(--primary-purple);
-      padding: 1rem; display: flex; align-items: center; justify-content: space-between;
+      padding: 0.75rem 1rem; 
+      display: flex; align-items: center; justify-content: space-between;
       position: fixed; top: 0; width: 100%; z-index: 10;
       flex-wrap: wrap;
     }
     .logo {
-      font-size: 1.5rem;
+      font-size: 1.2rem;
       font-weight: 700;
       color: var(--light-purple);
     }
     .search-bar {
       flex-grow: 1;
-      max-width: 400px;
-      margin: 0 1rem;
+      max-width: 300px;
+      margin: 0 0.5rem;
     }
     .search-bar input {
       width: 100%;
-      padding: 0.5rem;
+      padding: 0.4rem 0.8rem;
       background: rgba(255,255,255,0.1);
       border: 1px solid var(--primary-purple);
       border-radius: 20px;
       color: white;
-      padding-left: 1rem;
+      font-size: 0.9rem;
     }
     .search-bar input::placeholder {
       color: rgba(255,255,255,0.5);
     }
     .upload-btn {
-      padding: 0.5rem 1rem;
+      padding: 0.4rem 0.8rem;
       background: var(--primary-purple);
       color: white;
       border: none;
       border-radius: 5px;
       cursor: pointer;
-      margin-left: 0.5rem;
+      margin-left: 0.25rem;
       transition: all 0.3s ease;
+      font-size: 0.85rem;
     }
     .upload-btn:hover {
       background: #7B1FA2;
@@ -157,31 +159,33 @@
     .header-actions {
       display: flex;
       align-items: center;
+      gap: 0.25rem;
     }
     #profileDisplay {
-      margin-left: 1rem;
+      margin-left: 0.5rem;
       color: var(--light-purple);
+      font-size: 0.9rem;
     }
 
     /* Storage Info */
     .storage-info {
       position: fixed;
-      bottom: 20px;
-      right: 20px;
+      bottom: 15px;
+      right: 15px;
       background: var(--dark-gray);
-      padding: 0.75rem 1rem;
+      padding: 0.5rem 0.75rem;
       border-radius: 8px;
       border: 1px solid var(--primary-purple);
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       z-index: 5;
-      max-width: 200px;
+      max-width: 150px;
     }
     .storage-bar {
       width: 100%;
-      height: 8px;
+      height: 6px;
       background: rgba(255,255,255,0.1);
-      border-radius: 4px;
-      margin-top: 0.5rem;
+      border-radius: 3px;
+      margin-top: 0.25rem;
       overflow: hidden;
     }
     .storage-fill {
@@ -192,68 +196,89 @@
 
     /* Mobile Menu Toggle */
     .menu-toggle {
-      display: none;
       background: none;
       border: none;
       color: var(--light-purple);
-      font-size: 1.5rem;
+      font-size: 1.2rem;
       cursor: pointer;
+      padding: 0.25rem;
+      margin-right: 0.5rem;
+    }
+
+    /* Mobile Layout Container */
+    .mobile-layout {
+      display: none;
+      width: 100%;
+      height: calc(100vh - 60px);
+      margin-top: 60px;
+      overflow: hidden;
     }
 
     /* Sidebar */
     .sidebar {
-      width: 230px; 
+      width: 100%; 
       background: var(--dark-gray);
-      position: fixed; top: 65px; left: 0;
-      height: calc(100vh - 65px); 
+      height: auto;
+      max-height: 40vh;
       padding: 1rem; 
       overflow-y: auto;
-      transition: transform 0.3s ease;
-      z-index: 5;
+      border-bottom: 1px solid var(--primary-purple);
     }
     .sidebar h2 {
       color: var(--light-purple);
-      margin-bottom: 1rem;
-      font-size: 1.2rem;
+      margin-bottom: 0.75rem;
+      font-size: 1rem;
+    }
+    .subject-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 0.5rem;
     }
     .subject-folder {
-      padding: 0.75rem;
-      margin-bottom: 0.5rem;
+      padding: 0.6rem;
       background: rgba(106, 27, 154, 0.2);
       border-radius: 5px;
       cursor: pointer;
       transition: all 0.3s ease;
+      text-align: center;
+      font-size: 0.85rem;
+      border: 1px solid transparent;
     }
     .subject-folder:hover {
       background: rgba(106, 27, 154, 0.4);
-      transform: translateX(5px);
+      transform: translateY(-2px);
+      border-color: var(--primary-purple);
     }
     .subject-folder.active {
       background: var(--primary-purple);
+      border-color: var(--light-purple);
     }
 
     /* Main Content */
     .main-content {
-      margin-left: 250px;
-      margin-top: 80px;
-      padding: 1.5rem;
-      transition: margin-left 0.3s ease;
+      flex-grow: 1;
+      height: 60vh;
+      overflow-y: auto;
+      padding: 1rem;
+      background: var(--black);
     }
     #subjectTitle {
       color: var(--light-purple);
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+      text-align: center;
     }
     .file-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 2rem;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
     }
     .file-card {
       background: var(--dark-gray);
       border: 1px solid var(--primary-purple);
       border-radius: 8px; 
-      padding: 1.5rem;
+      padding: 1rem;
       position: relative;
       cursor: pointer;
       transition: all 0.3s ease;
@@ -262,47 +287,49 @@
       flex-direction: column;
     }
     .file-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 5px 15px rgba(106, 27, 154, 0.3);
+      transform: translateY(-3px);
+      box-shadow: 0 4px 12px rgba(106, 27, 154, 0.3);
     }
     .file-card h3 {
       color: var(--light-purple);
-      margin-bottom: 0.5rem;
-      font-size: 1.1rem;
+      margin-bottom: 0.4rem;
+      font-size: 0.95rem;
       word-break: break-word;
+      line-height: 1.2;
     }
     .file-card p {
-      font-size: 0.9rem;
+      font-size: 0.8rem;
       opacity: 0.8;
+      margin: 0.2rem 0;
     }
     .file-card .file-date {
       margin-top: auto;
-      font-size: 0.8rem;
+      font-size: 0.7rem;
       opacity: 0.6;
     }
     .file-icon {
-      font-size: 2rem;
-      margin-bottom: 0.5rem;
+      font-size: 1.5rem;
+      margin-bottom: 0.4rem;
       color: var(--light-purple);
     }
     .local-indicator {
       position: absolute;
-      top: 10px;
-      left: 10px;
+      top: 8px;
+      left: 8px;
       background: var(--success-green);
       color: white;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 0.6rem;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.5rem;
       font-weight: bold;
     }
 
     /* Delete Icon */
     .delete-icon {
       position: absolute;
-      top: 10px;
-      right: 10px;
-      font-size: 20px;
+      top: 8px;
+      right: 8px;
+      font-size: 16px;
       color: #ff4d4d;
       cursor: pointer;
       opacity: 0;
@@ -319,47 +346,49 @@
     .doc-nest {
       background: var(--dark-gray);
       border-radius: 8px;
-      padding: 1.5rem;
-      margin-top: 2rem;
+      padding: 1rem;
+      margin-bottom: 1rem;
     }
     .doc-nest-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 1rem;
+      margin-bottom: 0.75rem;
     }
     .doc-nest h2 {
       color: var(--light-purple);
       margin: 0;
+      font-size: 1rem;
     }
     #docNestViewer {
-      min-height: 200px;
+      min-height: 150px;
       background: rgba(0,0,0,0.2);
       border-radius: 5px;
-      padding: 1rem;
+      padding: 0.75rem;
     }
     .file-preview {
       display: flex;
       flex-direction: column;
-      gap: 1rem;
+      gap: 0.75rem;
     }
     .file-info {
       background: rgba(106, 27, 154, 0.1);
-      padding: 1rem;
+      padding: 0.75rem;
       border-radius: 5px;
       border-left: 3px solid var(--primary-purple);
     }
     .file-info h3 {
       color: var(--light-purple);
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.4rem;
+      font-size: 0.95rem;
     }
     .file-info p {
-      margin: 0.25rem 0;
-      font-size: 0.9rem;
+      margin: 0.2rem 0;
+      font-size: 0.8rem;
     }
     .preview-container {
       width: 100%;
-      height: 500px;
+      height: 300px;
       border-radius: 5px;
       overflow: hidden;
       background: #000;
@@ -378,17 +407,17 @@
     }
     .no-preview {
       text-align: center;
-      padding: 2rem;
+      padding: 1.5rem;
       opacity: 0.7;
     }
     .no-preview i {
-      font-size: 3rem;
-      margin-bottom: 1rem;
+      font-size: 2rem;
+      margin-bottom: 0.75rem;
       color: var(--light-purple);
     }
     .download-btn, .fullscreen-btn {
-      margin-top: 1rem;
-      padding: 0.75rem 1.5rem;
+      margin-top: 0.75rem;
+      padding: 0.5rem 1rem;
       background: var(--primary-purple);
       color: white;
       border: none;
@@ -396,17 +425,124 @@
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.4rem;
       transition: all 0.3s ease;
-      margin-right: 0.5rem;
+      margin-right: 0.4rem;
+      font-size: 0.85rem;
     }
     .download-btn:hover, .fullscreen-btn:hover {
       background: #7B1FA2;
     }
     .action-buttons {
       display: flex;
-      gap: 0.5rem;
+      gap: 0.4rem;
       flex-wrap: wrap;
+    }
+
+    /* PDF Reader Section */
+    .pdf-reader {
+      background: var(--dark-gray);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      display: none;
+    }
+    .pdf-reader.active {
+      display: block;
+    }
+    .pdf-reader-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--primary-purple);
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .pdf-reader h3 {
+      color: var(--light-purple);
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.95rem;
+    }
+    .pdf-controls {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .pdf-btn {
+      background: var(--primary-purple);
+      color: white;
+      border: none;
+      padding: 0.4rem 0.8rem;
+      border-radius: 5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.3s ease;
+      font-size: 0.8rem;
+    }
+    .pdf-btn:hover {
+      background: #7B1FA2;
+    }
+    .pdf-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .page-input {
+      width: 50px;
+      padding: 0.4rem;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid var(--primary-purple);
+      border-radius: 5px;
+      color: white;
+      text-align: center;
+      font-size: 0.8rem;
+    }
+    .zoom-select {
+      padding: 0.4rem;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid var(--primary-purple);
+      border-radius: 5px;
+      color: white;
+      font-size: 0.8rem;
+    }
+    .pdf-viewer-container {
+      width: 100%;
+      height: 400px;
+      background: #525659;
+      border-radius: 5px;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .pdf-viewer-container embed {
+      width: 100%;
+      height: 100%;
+    }
+    .pdf-loading {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      color: var(--light-purple);
+    }
+    .pdf-loading i {
+      font-size: 2rem;
+      margin-bottom: 0.75rem;
+      animation: spin 2s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
 
     /* Fullscreen Modal */
@@ -427,7 +563,7 @@
     }
     .fullscreen-header {
       background: var(--dark-gray);
-      padding: 1rem;
+      padding: 0.75rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -436,27 +572,28 @@
     }
     .fullscreen-title {
       color: var(--light-purple);
-      font-size: 1.2rem;
+      font-size: 1rem;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.4rem;
     }
     .fullscreen-controls {
       display: flex;
-      gap: 1rem;
+      gap: 0.5rem;
       align-items: center;
     }
     .fullscreen-btn-control {
       background: var(--primary-purple);
       color: white;
       border: none;
-      padding: 0.5rem 1rem;
+      padding: 0.4rem 0.8rem;
       border-radius: 5px;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.4rem;
       transition: all 0.3s ease;
+      font-size: 0.85rem;
     }
     .fullscreen-btn-control:hover {
       background: #7B1FA2;
@@ -465,14 +602,14 @@
       background: #ff4d4d;
       color: white;
       border: none;
-      width: 40px;
-      height: 40px;
+      width: 35px;
+      height: 35px;
       border-radius: 50%;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.2rem;
+      font-size: 1rem;
       transition: all 0.3s ease;
     }
     .close-fullscreen:hover {
@@ -507,25 +644,25 @@
     }
     .fullscreen-footer {
       background: var(--dark-gray);
-      padding: 0.5rem 1rem;
+      padding: 0.5rem;
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 1rem;
+      gap: 0.75rem;
       border-top: 1px solid var(--primary-purple);
     }
     .page-navigation {
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: 0.75rem;
       color: var(--light-purple);
     }
     .page-btn {
       background: var(--primary-purple);
       color: white;
       border: none;
-      width: 30px;
-      height: 30px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
       cursor: pointer;
       display: flex;
@@ -543,15 +680,15 @@
     .zoom-controls {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.4rem;
       color: var(--light-purple);
     }
     .zoom-btn {
       background: var(--primary-purple);
       color: white;
       border: none;
-      width: 30px;
-      height: 30px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
       cursor: pointer;
       display: flex;
@@ -563,9 +700,9 @@
       background: #7B1FA2;
     }
     .zoom-level {
-      min-width: 50px;
+      min-width: 45px;
       text-align: center;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
     }
 
     /* Modal */
@@ -584,11 +721,11 @@
     .modal-content {
       background-color: var(--dark-gray);
       margin: auto;
-      padding: 2rem;
+      padding: 1.5rem;
       border: 1px solid var(--primary-purple);
       border-radius: 10px;
-      width: 80%;
-      max-width: 500px;
+      width: 90%;
+      max-width: 400px;
       position: relative;
     }
     .close {
@@ -596,7 +733,7 @@
       right: 1rem;
       top: 1rem;
       color: var(--white);
-      font-size: 28px;
+      font-size: 24px;
       font-weight: bold;
       cursor: pointer;
     }
@@ -605,20 +742,22 @@
     }
     .modal h2 {
       color: var(--light-purple);
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
     }
     .modal input {
       width: 100%;
-      padding: 0.75rem;
-      margin-bottom: 1rem;
+      padding: 0.6rem;
+      margin-bottom: 0.75rem;
       background: rgba(255,255,255,0.1);
       border: 1px solid var(--primary-purple);
       border-radius: 5px;
       color: white;
+      font-size: 0.9rem;
     }
     .modal button {
       width: 100%;
-      padding: 0.75rem;
+      padding: 0.6rem;
       background: var(--primary-purple);
       color: white;
       border: none;
@@ -626,6 +765,7 @@
       cursor: pointer;
       font-family: var(--font-family);
       font-weight: 500;
+      font-size: 0.9rem;
     }
     .modal button:hover {
       background: #7B1FA2;
@@ -639,14 +779,15 @@
       transform: translateX(-50%) translateY(100px);
       background: var(--dark-gray);
       color: white;
-      padding: 1rem 1.5rem;
+      padding: 0.75rem 1.25rem;
       border-radius: 8px;
       border-left: 4px solid var(--primary-purple);
       z-index: 1001;
       opacity: 0;
       transition: all 0.3s ease;
-      min-width: 250px;
+      min-width: 200px;
       text-align: center;
+      font-size: 0.9rem;
     }
     .toast.show {
       transform: translateX(-50%) translateY(0);
@@ -662,14 +803,192 @@
       border-left-color: var(--warning-orange);
     }
 
-    /* Responsive Design */
-    @media (max-width: 1200px) {
+    /* Desktop Layout (Default) */
+    @media (min-width: 769px) {
+      .mobile-layout {
+        display: none;
+      }
+      .sidebar {
+        width: 230px; 
+        position: fixed; top: 65px; left: 0;
+        height: calc(100vh - 65px); 
+        padding: 1rem; 
+        overflow-y: auto;
+        transition: transform 0.3s ease;
+        z-index: 5;
+        border-bottom: none;
+        border-right: 1px solid var(--primary-purple);
+      }
+      .sidebar h2 {
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+      }
+      .subject-grid {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+      }
+      .subject-folder {
+        padding: 0.75rem;
+        font-size: 1rem;
+        text-align: left;
+      }
+      .main-content {
+        margin-left: 250px;
+        margin-top: 80px;
+        padding: 1.5rem;
+        height: auto;
+        background: transparent;
+      }
+      #subjectTitle {
+        font-size: 1.5rem;
+        text-align: left;
+        margin-bottom: 1.5rem;
+      }
       .file-grid {
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+      }
+      .file-card {
+        padding: 1.5rem;
+      }
+      .file-card h3 {
+        font-size: 1.1rem;
+      }
+      .file-card p {
+        font-size: 0.9rem;
+      }
+      .file-card .file-date {
+        font-size: 0.8rem;
+      }
+      .file-icon {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+      }
+      .local-indicator {
+        top: 10px;
+        left: 10px;
+        padding: 2px 6px;
+        font-size: 0.6rem;
+      }
+      .delete-icon {
+        top: 10px;
+        right: 10px;
+        font-size: 20px;
+      }
+      .doc-nest {
+        padding: 1.5rem;
+        margin-top: 2rem;
+      }
+      .doc-nest h2 {
+        font-size: 1.5rem;
+      }
+      .file-info h3 {
+        font-size: 1.1rem;
+      }
+      .file-info p {
+        font-size: 0.9rem;
+      }
+      .preview-container {
+        height: 500px;
+      }
+      .download-btn, .fullscreen-btn {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+      }
+      .pdf-reader {
+        padding: 1.5rem;
+        margin-top: 2rem;
+      }
+      .pdf-reader h3 {
+        font-size: 1.2rem;
+      }
+      .pdf-controls {
+        gap: 1rem;
+      }
+      .pdf-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+      }
+      .page-input {
+        width: 60px;
+        padding: 0.5rem;
+        font-size: 0.9rem;
+      }
+      .zoom-select {
+        padding: 0.5rem;
+        font-size: 0.9rem;
+      }
+      .pdf-viewer-container {
+        height: 600px;
+      }
+      .storage-info {
+        bottom: 20px;
+        right: 20px;
+        padding: 0.75rem 1rem;
+        font-size: 0.8rem;
+        max-width: 200px;
+      }
+      .storage-bar {
+        height: 8px;
+        margin-top: 0.5rem;
+      }
+      header {
+        padding: 1rem;
+      }
+      .logo {
+        font-size: 1.5rem;
+      }
+      .search-bar {
+        max-width: 400px;
+        margin: 0 1rem;
+      }
+      .search-bar input {
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+      }
+      .upload-btn {
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+        margin-left: 0.5rem;
+      }
+      .header-actions {
+        gap: 0.5rem;
+      }
+      #profileDisplay {
+        margin-left: 1rem;
+        font-size: 1rem;
+      }
+      .menu-toggle {
+        display: none;
+      }
+      .modal-content {
+        width: 80%;
+        max-width: 500px;
+        padding: 2rem;
+      }
+      .modal h2 {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+      .modal input {
+        padding: 0.75rem;
+        margin-bottom: 1rem;
+        font-size: 1rem;
+      }
+      .modal button {
+        padding: 0.75rem;
+        font-size: 1rem;
+      }
+      .toast {
+        min-width: 250px;
+        padding: 1rem 1.5rem;
+        font-size: 1rem;
       }
     }
 
-    @media (max-width: 900px) {
+    /* Tablet Layout */
+    @media (min-width: 769px) and (max-width: 900px) {
       .sidebar {
         width: 200px;
       }
@@ -684,95 +1003,73 @@
       }
     }
 
+    /* Mobile Layout */
     @media (max-width: 768px) {
-      .menu-toggle {
-        display: block;
+      .mobile-layout {
+        display: flex;
+        flex-direction: column;
       }
       .sidebar {
-        transform: translateX(-100%);
-        width: 250px;
-      }
-      .sidebar.active {
-        transform: translateX(0);
+        position: static;
+        width: 100%;
+        height: auto;
+        max-height: 30vh;
+        padding: 1rem;
+        overflow-y: auto;
+        border-bottom: 1px solid var(--primary-purple);
       }
       .main-content {
         margin-left: 0;
+        margin-top: 0;
         padding: 1rem;
-      }
-      header {
-        padding: 0.75rem 1rem;
-      }
-      .search-bar {
-        order: 3;
-        flex-basis: 100%;
-        max-width: 100%;
-        margin: 0.5rem 0;
-      }
-      .header-actions {
-        order: 2;
+        height: 70vh;
+        overflow-y: auto;
       }
       .file-grid {
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-        gap: 1rem;
-      }
-      .file-card {
-        padding: 1rem;
-      }
-      .preview-container {
-        height: 300px;
-      }
-      .fullscreen-header {
-        padding: 0.75rem;
-      }
-      .fullscreen-title {
-        font-size: 1rem;
-      }
-      .fullscreen-controls {
-        gap: 0.5rem;
-      }
-      .fullscreen-btn-control {
-        padding: 0.4rem 0.8rem;
-        font-size: 0.9rem;
-      }
-      .storage-info {
-        bottom: 10px;
-        right: 10px;
-        font-size: 0.7rem;
-      }
-    }
-
-    @media (max-width: 500px) {
-      .logo {
-        font-size: 1.2rem;
-      }
-      .file-grid {
-        grid-template-columns: 1fr;
-      }
-      .modal-content {
-        width: 95%;
-        padding: 1.5rem;
-      }
-      .login-form {
-        width: 90%;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 0.75rem;
       }
       .preview-container {
         height: 250px;
       }
-      .doc-nest-header {
+      .pdf-viewer-container {
+        height: 300px;
+      }
+    }
+
+    /* Small Mobile */
+    @media (max-width: 480px) {
+      .subject-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.4rem;
+      }
+      .file-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+      }
+      .file-card {
+        padding: 0.75rem;
+      }
+      .file-card h3 {
+        font-size: 0.85rem;
+      }
+      .file-card p {
+        font-size: 0.75rem;
+      }
+      .preview-container {
+        height: 200px;
+      }
+      .pdf-viewer-container {
+        height: 250px;
+      }
+      .pdf-reader-header {
         flex-direction: column;
         align-items: flex-start;
-        gap: 0.5rem;
+        gap: 0.75rem;
       }
-      .action-buttons {
+      .pdf-controls {
         width: 100%;
-      }
-      .download-btn, .fullscreen-btn {
-        flex: 1;
-        justify-content: center;
-      }
-      .fullscreen-footer {
-        flex-wrap: wrap;
-        gap: 0.5rem;
+        justify-content: space-between;
       }
       .storage-info {
         display: none;
@@ -841,12 +1138,13 @@
       </div>
     </header>
 
-    <div class="sidebar" id="sidebar">
+    <!-- DESKTOP LAYOUT -->
+    <div class="sidebar" id="desktopSidebar">
       <h2>Subjects</h2>
       <div id="subjectList"></div>
     </div>
 
-    <div class="main-content" id="mainContent">
+    <div class="main-content" id="desktopMainContent">
       <h2 id="subjectTitle">Select a Subject</h2>
       <div id="fileGrid" class="file-grid"></div>
 
@@ -858,6 +1156,108 @@
           </button>
         </div>
         <div id="docNestViewer">Select a file to preview details here.</div>
+      </div>
+
+      <!-- PDF Reader Section -->
+      <div id="pdfReader" class="pdf-reader">
+        <div class="pdf-reader-header">
+          <h3><i class="fas fa-file-pdf"></i> PDF Reader</h3>
+          <div class="pdf-controls">
+            <button class="pdf-btn" onclick="previousPDFPage()" id="pdfPrevBtn">
+              <i class="fas fa-chevron-left"></i> Previous
+            </button>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <input type="number" class="page-input" id="pdfPageInput" value="1" min="1" onchange="goToPDFPage()">
+              <span style="color: var(--light-purple);">/ <span id="pdfTotalPages">1</span></span>
+            </div>
+            <button class="pdf-btn" onclick="nextPDFPage()" id="pdfNextBtn">
+              Next <i class="fas fa-chevron-right"></i>
+            </button>
+            <select class="zoom-select" id="pdfZoomSelect" onchange="changePDFZoom()">
+              <option value="0.5">50%</option>
+              <option value="0.75">75%</option>
+              <option value="1" selected>100%</option>
+              <option value="1.25">125%</option>
+              <option value="1.5">150%</option>
+              <option value="2">200%</option>
+            </select>
+            <button class="pdf-btn" onclick="rotatePDF()">
+              <i class="fas fa-redo"></i> Rotate
+            </button>
+            <button class="pdf-btn" onclick="downloadPDF()">
+              <i class="fas fa-download"></i> Download
+            </button>
+          </div>
+        </div>
+        <div class="pdf-viewer-container" id="pdfViewerContainer">
+          <div class="pdf-loading" id="pdfLoading" style="display: none;">
+            <i class="fas fa-spinner"></i>
+            <p>Loading PDF...</p>
+          </div>
+          <embed id="pdfViewer" src="" type="application/pdf" style="width: 100%; height: 100%; display: none;">
+        </div>
+      </div>
+    </div>
+
+    <!-- MOBILE LAYOUT -->
+    <div class="mobile-layout" id="mobileLayout">
+      <div class="sidebar" id="mobileSidebar">
+        <h2>Subjects</h2>
+        <div class="subject-grid" id="mobileSubjectList"></div>
+      </div>
+      <div class="main-content" id="mobileMainContent">
+        <h2 id="mobileSubjectTitle">Select a Subject</h2>
+        <div id="mobileFileGrid" class="file-grid"></div>
+
+        <div class="doc-nest">
+          <div class="doc-nest-header">
+            <h2>Doc Nest</h2>
+            <button id="mobileFullscreenToggleBtn" class="fullscreen-btn" style="display:none;" onclick="openFullscreen()">
+              <i class="fas fa-expand"></i> Fullscreen
+            </button>
+          </div>
+          <div id="mobileDocNestViewer">Select a file to preview details here.</div>
+        </div>
+
+        <!-- Mobile PDF Reader Section -->
+        <div id="mobilePdfReader" class="pdf-reader">
+          <div class="pdf-reader-header">
+            <h3><i class="fas fa-file-pdf"></i> PDF Reader</h3>
+            <div class="pdf-controls">
+              <button class="pdf-btn" onclick="previousPDFPage()" id="mobilePdfPrevBtn">
+                <i class="fas fa-chevron-left"></i> Prev
+              </button>
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <input type="number" class="page-input" id="mobilePdfPageInput" value="1" min="1" onchange="goToPDFPage()">
+                <span style="color: var(--light-purple);">/ <span id="mobilePdfTotalPages">1</span></span>
+              </div>
+              <button class="pdf-btn" onclick="nextPDFPage()" id="mobilePdfNextBtn">
+                Next <i class="fas fa-chevron-right"></i>
+              </button>
+              <select class="zoom-select" id="mobilePdfZoomSelect" onchange="changePDFZoom()">
+                <option value="0.5">50%</option>
+                <option value="0.75">75%</option>
+                <option value="1" selected>100%</option>
+                <option value="1.25">125%</option>
+                <option value="1.5">150%</option>
+                <option value="2">200%</option>
+              </select>
+              <button class="pdf-btn" onclick="rotatePDF()">
+                <i class="fas fa-redo"></i> Rotate
+              </button>
+              <button class="pdf-btn" onclick="downloadPDF()">
+                <i class="fas fa-download"></i> Download
+              </button>
+            </div>
+          </div>
+          <div class="pdf-viewer-container" id="mobilePdfViewerContainer">
+            <div class="pdf-loading" id="mobilePdfLoading" style="display: none;">
+              <i class="fas fa-spinner"></i>
+              <p>Loading PDF...</p>
+            </div>
+            <embed id="mobilePdfViewer" src="" type="application/pdf" style="width: 100%; height: 100%; display: none;">
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1025,6 +1425,8 @@ let currentFile = null;
 let currentZoom = 100;
 let currentPage = 1;
 let totalPages = 1;
+let currentPDFRotation = 0;
+let isMobile = false;
 
 // Initialize app
 window.onload = async () => {
@@ -1040,9 +1442,13 @@ window.onload = async () => {
     document.body.style.overflow = 'auto';
   }, 2000);
 
+  // Check if mobile
+  checkMobile();
+  window.addEventListener('resize', checkMobile);
+
   // Setup mobile menu toggle
   document.getElementById('menuToggle').addEventListener('click', function() {
-    document.getElementById('sidebar').classList.toggle('active');
+    toggleMobileSidebar();
   });
 
   // Setup keyboard shortcuts
@@ -1053,13 +1459,37 @@ window.onload = async () => {
   });
 };
 
+function checkMobile() {
+  isMobile = window.innerWidth <= 768;
+  if (isMobile) {
+    document.getElementById('desktopSidebar').style.display = 'none';
+    document.getElementById('desktopMainContent').style.display = 'none';
+    document.getElementById('mobileLayout').style.display = 'flex';
+  } else {
+    document.getElementById('desktopSidebar').style.display = 'block';
+    document.getElementById('desktopMainContent').style.display = 'block';
+    document.getElementById('mobileLayout').style.display = 'none';
+  }
+}
+
+function toggleMobileSidebar() {
+  const mobileSidebar = document.getElementById('mobileSidebar');
+  if (mobileSidebar.style.maxHeight === '0px' || !mobileSidebar.style.maxHeight) {
+    mobileSidebar.style.maxHeight = '40vh';
+    mobileSidebar.style.overflow = 'auto';
+  } else {
+    mobileSidebar.style.maxHeight = '0px';
+    mobileSidebar.style.overflow = 'hidden';
+  }
+}
+
 // Storage functions
 function loadFilesFromStorage() {
   const storedFiles = localStorage.getItem('docsNestFiles');
   if (storedFiles) {
     try {
       const parsedFiles = JSON.parse(storedFiles);
-      // Merge with default files
+      // Merge with default files - make uploaded files visible to all users
       Object.keys(parsedFiles).forEach(subject => {
         if (mockFiles[subject]) {
           mockFiles[subject] = [...mockFiles[subject], ...parsedFiles[subject]];
@@ -1104,7 +1534,7 @@ async function updateStorageInfo() {
       totalSize += estimate.usage || 0;
     }
     
-    const maxSize = 500 * 1024 * 1024; // 500MB limit (increased from 50MB)
+    const maxSize = 500 * 1024 * 1024; // 500MB limit
     const percentage = Math.min((totalSize / maxSize) * 100, 100);
     
     document.getElementById('storageText').textContent = `${formatFileSize(totalSize)} / 500 MB`;
@@ -1189,18 +1619,34 @@ function getFileIcon(type) {
 }
 
 function renderSubjects(){
-  const list = document.getElementById('subjectList');
-  list.innerHTML = '';
+  // Desktop version
+  const desktopList = document.getElementById('subjectList');
+  desktopList.innerHTML = '';
+  
+  // Mobile version
+  const mobileList = document.getElementById('mobileSubjectList');
+  mobileList.innerHTML = '';
+  
   for(let subject in mockFiles){
-    const div = document.createElement('div');
-    div.className = 'subject-folder';
+    // Desktop subject folder
+    const desktopDiv = document.createElement('div');
+    desktopDiv.className = 'subject-folder';
     if(subject === currentSubject) {
-      div.classList.add('active');
+      desktopDiv.classList.add('active');
     }
-    div.textContent = subject.replace(/-/g,' ').toUpperCase();
+    desktopDiv.textContent = subject.replace(/-/g,' ').toUpperCase();
+    desktopDiv.onclick = () => loadSubject(subject, desktopDiv);
+    desktopList.appendChild(desktopDiv);
     
-    div.onclick = () => loadSubject(subject, div);
-    list.appendChild(div);
+    // Mobile subject folder
+    const mobileDiv = document.createElement('div');
+    mobileDiv.className = 'subject-folder';
+    if(subject === currentSubject) {
+      mobileDiv.classList.add('active');
+    }
+    mobileDiv.textContent = subject.replace(/-/g,' ').toUpperCase();
+    mobileDiv.onclick = () => loadSubject(subject, mobileDiv);
+    mobileList.appendChild(mobileDiv);
   }
 }
 
@@ -1232,53 +1678,66 @@ function loginAdmin(){
 
 function loadSubject(subject){
   currentSubject = subject;
-  const grid = document.getElementById('fileGrid');
+  
+  // Update both desktop and mobile grids
+  const desktopGrid = document.getElementById('fileGrid');
+  const mobileGrid = document.getElementById('mobileFileGrid');
   const files = mockFiles[subject] || [];
-  grid.innerHTML='';
+  
+  desktopGrid.innerHTML = '';
+  mobileGrid.innerHTML = '';
 
-  // Close mobile menu after selection
-  if(window.innerWidth <= 768) {
-    document.getElementById('sidebar').classList.remove('active');
+  // Close mobile sidebar after selection
+  if (isMobile) {
+    document.getElementById('mobileSidebar').style.maxHeight = '0px';
   }
 
   files.forEach((file, index)=>{
-    const card = document.createElement('div');
-    card.className = 'file-card';
+    // Create file card for both desktop and mobile
+    const createFileCard = (grid) => {
+      const card = document.createElement('div');
+      card.className = 'file-card';
 
-    // Add local indicator for uploaded files
-    if (file.isLocal) {
-      const indicator = document.createElement('div');
-      indicator.className = 'local-indicator';
-      indicator.textContent = 'LOCAL';
-      card.appendChild(indicator);
-    }
+      // Add local indicator for uploaded files
+      if (file.isLocal) {
+        const indicator = document.createElement('div');
+        indicator.className = 'local-indicator';
+        indicator.textContent = 'LOCAL';
+        card.appendChild(indicator);
+      }
 
-    const trash = document.createElement('span');
-    trash.className = 'delete-icon';
-    trash.innerHTML = "<i class='fas fa-trash'></i>";
-    trash.onclick = (e)=>{
-      e.stopPropagation();
-      deleteFile(index);
+      const trash = document.createElement('span');
+      trash.className = 'delete-icon';
+      trash.innerHTML = "<i class='fas fa-trash'></i>";
+      trash.onclick = (e)=>{
+        e.stopPropagation();
+        deleteFile(index);
+      };
+
+      card.innerHTML = `
+        <div class="file-icon">
+          <i class="${getFileIcon(file.type)}"></i>
+        </div>
+        <h3>${file.name}</h3>
+        <p>Type: ${file.type}</p>
+        <p>Category: ${file.nested}</p>
+        <p class="file-date">Date: ${file.date}</p>
+      `;
+      
+      // Only show delete icon for admin
+      if(currentUser === 'admin') card.appendChild(trash);
+
+      card.onclick = ()=>viewFile(file);
+      grid.appendChild(card);
     };
-
-    card.innerHTML = `
-      <div class="file-icon">
-        <i class="${getFileIcon(file.type)}"></i>
-      </div>
-      <h3>${file.name}</h3>
-      <p>Type: ${file.type}</p>
-      <p>Category: ${file.nested}</p>
-      <p class="file-date">Date: ${file.date}</p>
-    `;
     
-    if(currentUser === 'admin') card.appendChild(trash);
-
-    card.onclick = ()=>viewFile(file);
-
-    grid.appendChild(card);
+    createFileCard(desktopGrid);
+    createFileCard(mobileGrid);
   });
 
+  // Update titles for both desktop and mobile
   document.getElementById('subjectTitle').textContent = subject.replace(/-/g,' ').toUpperCase();
+  document.getElementById('mobileSubjectTitle').textContent = subject.replace(/-/g,' ').toUpperCase();
   
   // Update active state in sidebar
   renderSubjects();
@@ -1315,7 +1774,7 @@ async function uploadFile(){
 
   // Check storage limit
   const currentStorage = parseInt(localStorage.getItem('docsNestFiles')?.length || 0);
-  if (currentStorage > 400 * 1024 * 1024) { // 400MB limit (increased from 40MB)
+  if (currentStorage > 400 * 1024 * 1024) { // 400MB limit
     showToast('Storage limit reached. Please delete some files first.', 'warning');
     return;
   }
@@ -1422,9 +1881,12 @@ async function viewFile(file){
     
     if(fileType === 'pdf') {
       viewerContent += `<embed src="${file.path}" width="100%" height="100%" type="application/pdf">`;
+      // Show PDF reader for PDF files
+      showPDFReader(file);
     }
     else if(['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(fileType)) {
       viewerContent += `<img src="${file.path}" alt="${file.name}">`;
+      hidePDFReader();
     }
     else if(['mp4', 'webm', 'ogg'].includes(fileType)) {
       viewerContent += `
@@ -1433,36 +1895,41 @@ async function viewFile(file){
           Your browser does not support video tag.
         </video>
       `;
+      hidePDFReader();
     }
     else if(['mp3', 'wav', 'ogg'].includes(fileType)) {
       viewerContent += `
         <div style="text-align: center; width: 100%;">
-          <i class="fas fa-file-audio" style="font-size: 4rem; color: var(--light-purple); margin-bottom: 1rem;"></i>
-          <p style="margin-bottom: 1rem;">Audio File: ${file.name}</p>
+          <i class="fas fa-file-audio" style="font-size: 3rem; color: var(--light-purple); margin-bottom: 0.75rem;"></i>
+          <p style="margin-bottom: 0.75rem;">Audio File: ${file.name}</p>
           <audio controls style="width: 80%;">
             <source src="${file.path}" type="audio/${fileType}">
             Your browser does not support audio element.
           </audio>
         </div>
       `;
+      hidePDFReader();
     }
     else if(['txt', 'md'].includes(fileType)) {
       viewerContent += `
-        <iframe src="${file.path}" width="100%" height="100%" style="background: white; color: black; padding: 1rem;">
+        <iframe src="${file.path}" width="100%" height="100%" style="background: white; color: black; padding: 0.75rem;">
         </iframe>
       `;
+      hidePDFReader();
     }
     else if(['html', 'htm'].includes(fileType)) {
       viewerContent += `<iframe src="${file.path}" width="100%" height="100%"></iframe>`;
+      hidePDFReader();
     }
     else {
       viewerContent += `
         <div class="no-preview">
           <i class="${getFileIcon(fileType)}"></i>
           <p>Preview not available for this file type</p>
-          <p style="font-size: 0.9rem; opacity: 0.7;">File type: ${fileType}</p>
+          <p style="font-size: 0.8rem; opacity: 0.7;">File type: ${fileType}</p>
         </div>
       `;
+      hidePDFReader();
     }
   } else {
     viewerContent += `
@@ -1471,6 +1938,7 @@ async function viewFile(file){
         <p>No preview available</p>
       </div>
     `;
+    hidePDFReader();
   }
   
   viewerContent += '</div>';
@@ -1499,7 +1967,145 @@ async function viewFile(file){
   viewerContent += '</div>';
   viewerContent += '</div>';
   
+  // Update both desktop and mobile viewers
   document.getElementById('docNestViewer').innerHTML = viewerContent;
+  document.getElementById('mobileDocNestViewer').innerHTML = viewerContent;
+  
+  // Show/hide fullscreen buttons
+  if(file.path) {
+    document.getElementById('fullscreenToggleBtn').style.display = 'inline-flex';
+    document.getElementById('mobileFullscreenToggleBtn').style.display = 'inline-flex';
+  } else {
+    document.getElementById('fullscreenToggleBtn').style.display = 'none';
+    document.getElementById('mobileFullscreenToggleBtn').style.display = 'none';
+  }
+}
+
+// PDF Reader Functions
+function showPDFReader(file) {
+  const pdfReader = document.getElementById('pdfReader');
+  const mobilePdfReader = document.getElementById('mobilePdfReader');
+  const pdfViewer = document.getElementById('pdfViewer');
+  const mobilePdfViewer = document.getElementById('mobilePdfViewer');
+  const pdfLoading = document.getElementById('pdfLoading');
+  const mobilePdfLoading = document.getElementById('mobilePdfLoading');
+  
+  pdfReader.classList.add('active');
+  mobilePdfReader.classList.add('active');
+  pdfLoading.style.display = 'block';
+  mobilePdfLoading.style.display = 'block';
+  pdfViewer.style.display = 'none';
+  mobilePdfViewer.style.display = 'none';
+  
+  // Set PDF source with parameters for better viewing
+  const pdfSrc = `${file.path}#toolbar=0&navpanes=0&scrollbar=0`;
+  pdfViewer.src = pdfSrc;
+  mobilePdfViewer.src = pdfSrc;
+  
+  // Simulate page count (in real implementation, you'd use PDF.js to get actual page count)
+  document.getElementById('pdfTotalPages').textContent = '10';
+  document.getElementById('mobilePdfTotalPages').textContent = '10';
+  document.getElementById('pdfPageInput').value = '1';
+  document.getElementById('mobilePdfPageInput').value = '1';
+  document.getElementById('pdfPageInput').max = '10';
+  document.getElementById('mobilePdfPageInput').max = '10';
+  
+  // Update buttons
+  updatePDFNavigationButtons();
+  
+  // Hide loading after a delay
+  setTimeout(() => {
+    pdfLoading.style.display = 'none';
+    mobilePdfLoading.style.display = 'none';
+    pdfViewer.style.display = 'block';
+    mobilePdfViewer.style.display = 'block';
+  }, 1500);
+}
+
+function hidePDFReader() {
+  document.getElementById('pdfReader').classList.remove('active');
+  document.getElementById('mobilePdfReader').classList.remove('active');
+}
+
+function previousPDFPage() {
+  const currentPage = parseInt(document.getElementById('pdfPageInput').value);
+  const mobileCurrentPage = parseInt(document.getElementById('mobilePdfPageInput').value);
+  if (currentPage > 1) {
+    document.getElementById('pdfPageInput').value = currentPage - 1;
+    document.getElementById('mobilePdfPageInput').value = mobileCurrentPage - 1;
+    goToPDFPage();
+  }
+}
+
+function nextPDFPage() {
+  const currentPage = parseInt(document.getElementById('pdfPageInput').value);
+  const mobileCurrentPage = parseInt(document.getElementById('mobilePdfPageInput').value);
+  const totalPages = parseInt(document.getElementById('pdfTotalPages').textContent);
+  if (currentPage < totalPages) {
+    document.getElementById('pdfPageInput').value = currentPage + 1;
+    document.getElementById('mobilePdfPageInput').value = mobileCurrentPage + 1;
+    goToPDFPage();
+  }
+}
+
+function goToPDFPage() {
+  const page = parseInt(document.getElementById('pdfPageInput').value);
+  const mobilePage = parseInt(document.getElementById('mobilePdfPageInput').value);
+  const totalPages = parseInt(document.getElementById('pdfTotalPages').textContent);
+  
+  if (page >= 1 && page <= totalPages) {
+    const pdfViewer = document.getElementById('pdfViewer');
+    const mobilePdfViewer = document.getElementById('mobilePdfViewer');
+    const currentSrc = pdfViewer.src.split('#')[0];
+    pdfViewer.src = `${currentSrc}#page=${page}&toolbar=0&navpanes=0&scrollbar=0`;
+    mobilePdfViewer.src = `${currentSrc}#page=${page}&toolbar=0&navpanes=0&scrollbar=0`;
+    updatePDFNavigationButtons();
+  }
+}
+
+function updatePDFNavigationButtons() {
+  const currentPage = parseInt(document.getElementById('pdfPageInput').value);
+  const totalPages = parseInt(document.getElementById('pdfTotalPages').textContent);
+  
+  document.getElementById('pdfPrevBtn').disabled = currentPage <= 1;
+  document.getElementById('pdfNextBtn').disabled = currentPage >= totalPages;
+  document.getElementById('mobilePdfPrevBtn').disabled = currentPage <= 1;
+  document.getElementById('mobilePdfNextBtn').disabled = currentPage >= totalPages;
+}
+
+function changePDFZoom() {
+  const zoom = document.getElementById('pdfZoomSelect').value;
+  const mobileZoom = document.getElementById('mobilePdfZoomSelect').value;
+  const pdfViewer = document.getElementById('pdfViewer');
+  const mobilePdfViewer = document.getElementById('mobilePdfViewer');
+  const currentSrc = pdfViewer.src.split('#')[0];
+  const currentPage = document.getElementById('pdfPageInput').value;
+  
+  pdfViewer.src = `${currentSrc}#page=${currentPage}&zoom=${zoom}&toolbar=0&navpanes=0&scrollbar=0`;
+  mobilePdfViewer.src = `${currentSrc}#page=${currentPage}&zoom=${mobileZoom}&toolbar=0&navpanes=0&scrollbar=0`;
+}
+
+function rotatePDF() {
+  currentPDFRotation = (currentPDFRotation + 90) % 360;
+  const pdfViewer = document.getElementById('pdfViewer');
+  const mobilePdfViewer = document.getElementById('mobilePdfViewer');
+  pdfViewer.style.transform = `rotate(${currentPDFRotation}deg)`;
+  mobilePdfViewer.style.transform = `rotate(${currentPDFRotation}deg)`;
+}
+
+function downloadPDF() {
+  if (currentFile && currentFile.isLocal) {
+    downloadLocalFile(currentFile.id, currentFile.name);
+  } else if (currentFile && currentFile.path) {
+    // For non-local PDFs, create a download link
+    const a = document.createElement('a');
+    a.href = currentFile.path;
+    a.download = currentFile.name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    showToast('Download started', 'success');
+  }
 }
 
 async function downloadLocalFile(fileId, fileName) {
@@ -1554,7 +2160,7 @@ function openFullscreen() {
     content.innerHTML = `
       <video id="fullscreenVideo" controls style="width: 100%; height: 100%;">
         <source src="${currentFile.path}" type="video/${fileType}">
-        Your browser does not support the video tag.
+        Your browser does not support video tag.
       </video>
     `;
     document.getElementById('pageNavigation').style.display = 'none';
@@ -1563,11 +2169,11 @@ function openFullscreen() {
   else if(['mp3', 'wav', 'ogg'].includes(fileType)) {
     content.innerHTML = `
       <div style="text-align: center; width: 100%;">
-        <i class="fas fa-file-audio" style="font-size: 5rem; color: var(--light-purple); margin-bottom: 2rem;"></i>
-        <h2 style="color: var(--light-purple); margin-bottom: 2rem;">${currentFile.name}</h2>
-        <audio controls style="width: 80%; max-width: 500px;">
+        <i class="fas fa-file-audio" style="font-size: 4rem; color: var(--light-purple); margin-bottom: 1.5rem;"></i>
+        <h2 style="color: var(--light-purple); margin-bottom: 1.5rem;">${currentFile.name}</h2>
+        <audio controls style="width: 80%; max-width: 400px;">
           <source src="${currentFile.path}" type="audio/${fileType}">
-          Your browser does not support the audio element.
+          Your browser does not support audio element.
         </audio>
       </div>
     `;
@@ -1582,7 +2188,7 @@ function openFullscreen() {
   else {
     content.innerHTML = `
       <div class="no-preview">
-        <i class="${getFileIcon(fileType)}" style="font-size: 5rem;"></i>
+        <i class="${getFileIcon(fileType)}" style="font-size: 4rem;"></i>
         <h2>${currentFile.name}</h2>
         <p>Cannot preview this file type in fullscreen</p>
         <p style="font-size: 0.9rem; opacity: 0.7;">File type: ${fileType}</p>
@@ -1684,7 +2290,7 @@ function nextPage() {
   if (currentPage < totalPages) {
     currentPage++;
     document.getElementById('currentPage').textContent = currentPage;
-    // Note: Actual PDF page navigation would require PDF.js integration
+    // Note: Actual PDF page navigation would require PDF.php integration
   }
 }
 
@@ -1711,8 +2317,11 @@ function searchFiles() {
   if(!currentSubject) return;
   
   const files = mockFiles[currentSubject] || [];
-  const grid = document.getElementById('fileGrid');
-  grid.innerHTML = '';
+  const desktopGrid = document.getElementById('fileGrid');
+  const mobileGrid = document.getElementById('mobileFileGrid');
+  
+  desktopGrid.innerHTML = '';
+  mobileGrid.innerHTML = '';
   
   const filteredFiles = files.filter(file => 
     file.name.toLowerCase().includes(searchTerm) || 
@@ -1720,46 +2329,54 @@ function searchFiles() {
   );
   
   if(filteredFiles.length === 0) {
-    grid.innerHTML = '<p style="opacity: 0.7; grid-column: 1/-1;">No files found matching your search.</p>';
+    const noResults = '<p style="opacity: 0.7; grid-column: 1/-1;">No files found matching your search.</p>';
+    desktopGrid.innerHTML = noResults;
+    mobileGrid.innerHTML = noResults;
     return;
   }
   
   filteredFiles.forEach((file, index) => {
     const originalIndex = files.indexOf(file);
-    const card = document.createElement('div');
-    card.className = 'file-card';
-
-    // Add local indicator for uploaded files
-    if (file.isLocal) {
-      const indicator = document.createElement('div');
-      indicator.className = 'local-indicator';
-      indicator.textContent = 'LOCAL';
-      card.appendChild(indicator);
-    }
-
-    const trash = document.createElement('span');
-    trash.className = 'delete-icon';
-    trash.innerHTML = "<i class='fas fa-trash'></i>";
-    trash.onclick = (e) => {
-      e.stopPropagation();
-      deleteFile(originalIndex);
-    };
-
-    card.innerHTML = `
-      <div class="file-icon">
-        <i class="${getFileIcon(file.type)}"></i>
-      </div>
-      <h3>${file.name}</h3>
-      <p>Type: ${file.type}</p>
-      <p>Category: ${file.nested}</p>
-      <p class="file-date">Date: ${file.date}</p>
-    `;
     
-    if(currentUser === 'admin') card.appendChild(trash);
+    const createFileCard = (grid) => {
+      const card = document.createElement('div');
+      card.className = 'file-card';
 
-    card.onclick = () => viewFile(file);
+      // Add local indicator for uploaded files
+      if (file.isLocal) {
+        const indicator = document.createElement('div');
+        indicator.className = 'local-indicator';
+        indicator.textContent = 'LOCAL';
+        card.appendChild(indicator);
+      }
 
-    grid.appendChild(card);
+      const trash = document.createElement('span');
+      trash.className = 'delete-icon';
+      trash.innerHTML = "<i class='fas fa-trash'></i>";
+      trash.onclick = (e) => {
+        e.stopPropagation();
+        deleteFile(originalIndex);
+      };
+
+      card.innerHTML = `
+        <div class="file-icon">
+          <i class="${getFileIcon(file.type)}"></i>
+        </div>
+        <h3>${file.name}</h3>
+        <p>Type: ${file.type}</p>
+        <p>Category: ${file.nested}</p>
+        <p class="file-date">Date: ${file.date}</p>
+      `;
+      
+      // Only show delete icon for admin
+      if(currentUser === 'admin') card.appendChild(trash);
+
+      card.onclick = () => viewFile(file);
+      grid.appendChild(card);
+    };
+    
+    createFileCard(desktopGrid);
+    createFileCard(mobileGrid);
   });
 }
 
@@ -1806,7 +2423,7 @@ function addSubject() {
   // Reset form
   document.getElementById('subjectNameInput').value = '';
   
-  // Load: newly added subject
+  // Load newly added subject
   loadSubject(subjectKey);
   showToast('Subject added successfully', 'success');
 }
@@ -1835,8 +2452,12 @@ function removeSubject() {
     saveFilesToStorage();
     renderSubjects();
     document.getElementById('subjectTitle').textContent = 'Select a Subject';
+    document.getElementById('mobileSubjectTitle').textContent = 'Select a Subject';
     document.getElementById('fileGrid').innerHTML = '';
+    document.getElementById('mobileFileGrid').innerHTML = '';
     document.getElementById('docNestViewer').innerHTML = 'Select a file to preview details here.';
+    document.getElementById('mobileDocNestViewer').innerHTML = 'Select a file to preview details here.';
+    hidePDFReader();
     showToast('Subject removed successfully', 'success');
   }
 }
