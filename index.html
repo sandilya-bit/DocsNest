@@ -1,0 +1,1846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Code'n'Go - Academic Resource Manager</title>
+  
+  <!-- Adding Poppins font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --primary-purple: #6A1B9A;
+      --black: #000000;
+      --dark-gray: #1e1e1e;
+      --light-purple: #E1BEE7;
+      --white: #FFFFFF;
+      --font-family: 'Poppins', sans-serif;
+      --success-green: #4CAF50;
+      --warning-orange: #FF9800;
+      --danger-red: #f44336;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: var(--font-family);
+      background-color: var(--black);
+      color: var(--white);
+      overflow-x: hidden;
+    }
+
+    /* Loading Screen */
+    .loading-screen {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100vh;
+      background: linear-gradient(135deg, var(--black), var(--primary-purple));
+      display: flex; justify-content: center; align-items: center; flex-direction: column;
+      z-index: 9999;
+      animation: fadeOut 1s ease forwards;
+      animation-delay: 1.8s;
+    }
+    .loading-text {
+      font-size: 2.5rem; font-weight: bold; color: var(--light-purple);
+      animation: pulse 1s infinite;
+    }
+    .loading-sub { font-size: 1rem; color: var(--white); margin-top: 0.5rem; opacity: 0.8; }
+    @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.5;} }
+    @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
+
+    /* Login */
+    .login-container {
+      display: flex; justify-content: center; align-items: center;
+      height: 100vh;
+      background: linear-gradient(135deg, var(--primary-purple), var(--black));
+    }
+    .login-form {
+      background: var(--dark-gray);
+      padding: 2rem;
+      border-radius: 10px;
+      width: 320px; text-align: center;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+    .login-form h1 {
+      color: var(--light-purple);
+      margin-bottom: 1.5rem;
+    }
+    .login-form p {
+      margin-bottom: 1.5rem;
+      opacity: 0.8;
+    }
+    .role-btn {
+      width: 100%;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      background: var(--primary-purple);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-family: var(--font-family);
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+    .role-btn:hover {
+      background: #7B1FA2;
+      transform: translateY(-2px);
+    }
+    #adminPasswordDiv input {
+      width: 100%;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid var(--primary-purple);
+      border-radius: 5px;
+      color: white;
+    }
+    #adminPasswordDiv button {
+      width: 100%;
+      padding: 0.75rem;
+      background: var(--primary-purple);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-family: var(--font-family);
+      font-weight: 500;
+    }
+
+    /* App Layout */
+    .app-container { display: none; height: 100vh; }
+    header {
+      background: var(--black);
+      border-bottom: 2px solid var(--primary-purple);
+      padding: 1rem; display: flex; align-items: center; justify-content: space-between;
+      position: fixed; top: 0; width: 100%; z-index: 10;
+      flex-wrap: wrap;
+    }
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--light-purple);
+    }
+    .search-bar {
+      flex-grow: 1;
+      max-width: 400px;
+      margin: 0 1rem;
+    }
+    .search-bar input {
+      width: 100%;
+      padding: 0.5rem;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid var(--primary-purple);
+      border-radius: 20px;
+      color: white;
+      padding-left: 1rem;
+    }
+    .search-bar input::placeholder {
+      color: rgba(255,255,255,0.5);
+    }
+    .upload-btn {
+      padding: 0.5rem 1rem;
+      background: var(--primary-purple);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-left: 0.5rem;
+      transition: all 0.3s ease;
+    }
+    .upload-btn:hover {
+      background: #7B1FA2;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+    }
+    #profileDisplay {
+      margin-left: 1rem;
+      color: var(--light-purple);
+    }
+
+    /* Storage Info */
+    .storage-info {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--dark-gray);
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--primary-purple);
+      font-size: 0.8rem;
+      z-index: 5;
+      max-width: 200px;
+    }
+    .storage-bar {
+      width: 100%;
+      height: 8px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 4px;
+      margin-top: 0.5rem;
+      overflow: hidden;
+    }
+    .storage-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--success-green), var(--warning-orange), var(--danger-red));
+      transition: width 0.3s ease;
+    }
+
+    /* Mobile Menu Toggle */
+    .menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--light-purple);
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 230px; 
+      background: var(--dark-gray);
+      position: fixed; top: 65px; left: 0;
+      height: calc(100vh - 65px); 
+      padding: 1rem; 
+      overflow-y: auto;
+      transition: transform 0.3s ease;
+      z-index: 5;
+    }
+    .sidebar h2 {
+      color: var(--light-purple);
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+    }
+    .subject-folder {
+      padding: 0.75rem;
+      margin-bottom: 0.5rem;
+      background: rgba(106, 27, 154, 0.2);
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .subject-folder:hover {
+      background: rgba(106, 27, 154, 0.4);
+      transform: translateX(5px);
+    }
+    .subject-folder.active {
+      background: var(--primary-purple);
+    }
+
+    /* Main Content */
+    .main-content {
+      margin-left: 250px;
+      margin-top: 80px;
+      padding: 1.5rem;
+      transition: margin-left 0.3s ease;
+    }
+    #subjectTitle {
+      color: var(--light-purple);
+      margin-bottom: 1.5rem;
+    }
+    .file-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .file-card {
+      background: var(--dark-gray);
+      border: 1px solid var(--primary-purple);
+      border-radius: 8px; 
+      padding: 1.5rem;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    .file-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(106, 27, 154, 0.3);
+    }
+    .file-card h3 {
+      color: var(--light-purple);
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+      word-break: break-word;
+    }
+    .file-card p {
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+    .file-card .file-date {
+      margin-top: auto;
+      font-size: 0.8rem;
+      opacity: 0.6;
+    }
+    .file-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      color: var(--light-purple);
+    }
+    .local-indicator {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: var(--success-green);
+      color: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.6rem;
+      font-weight: bold;
+    }
+
+    /* Delete Icon */
+    .delete-icon {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 20px;
+      color: #ff4d4d;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .file-card:hover .delete-icon {
+      opacity: 1;
+    }
+    .delete-icon:hover {
+      transform: scale(1.2);
+    }
+
+    /* Doc Nest */
+    .doc-nest {
+      background: var(--dark-gray);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-top: 2rem;
+    }
+    .doc-nest-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .doc-nest h2 {
+      color: var(--light-purple);
+      margin: 0;
+    }
+    #docNestViewer {
+      min-height: 200px;
+      background: rgba(0,0,0,0.2);
+      border-radius: 5px;
+      padding: 1rem;
+    }
+    .file-preview {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .file-info {
+      background: rgba(106, 27, 154, 0.1);
+      padding: 1rem;
+      border-radius: 5px;
+      border-left: 3px solid var(--primary-purple);
+    }
+    .file-info h3 {
+      color: var(--light-purple);
+      margin-bottom: 0.5rem;
+    }
+    .file-info p {
+      margin: 0.25rem 0;
+      font-size: 0.9rem;
+    }
+    .preview-container {
+      width: 100%;
+      height: 500px;
+      border-radius: 5px;
+      overflow: hidden;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .preview-container img,
+    .preview-container video,
+    .preview-container embed,
+    .preview-container iframe {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+    .no-preview {
+      text-align: center;
+      padding: 2rem;
+      opacity: 0.7;
+    }
+    .no-preview i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      color: var(--light-purple);
+    }
+    .download-btn, .fullscreen-btn {
+      margin-top: 1rem;
+      padding: 0.75rem 1.5rem;
+      background: var(--primary-purple);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.3s ease;
+      margin-right: 0.5rem;
+    }
+    .download-btn:hover, .fullscreen-btn:hover {
+      background: #7B1FA2;
+    }
+    .action-buttons {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    /* Fullscreen Modal */
+    .fullscreen-modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.95);
+      animation: fadeIn 0.3s ease;
+    }
+    .fullscreen-modal.active {
+      display: flex;
+      flex-direction: column;
+    }
+    .fullscreen-header {
+      background: var(--dark-gray);
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--primary-purple);
+      z-index: 10;
+    }
+    .fullscreen-title {
+      color: var(--light-purple);
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .fullscreen-controls {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    .fullscreen-btn-control {
+      background: var(--primary-purple);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.3s ease;
+    }
+    .fullscreen-btn-control:hover {
+      background: #7B1FA2;
+    }
+    .close-fullscreen {
+      background: #ff4d4d;
+      color: white;
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      transition: all 0.3s ease;
+    }
+    .close-fullscreen:hover {
+      background: #ff6666;
+      transform: rotate(90deg);
+    }
+    .fullscreen-content {
+      flex-grow: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      overflow: auto;
+      position: relative;
+    }
+    .fullscreen-content img,
+    .fullscreen-content video,
+    .fullscreen-content embed,
+    .fullscreen-content iframe {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+    .fullscreen-content embed {
+      width: 100%;
+      height: 100%;
+    }
+    .fullscreen-content video {
+      width: 100%;
+      height: auto;
+      max-height: 100%;
+    }
+    .fullscreen-footer {
+      background: var(--dark-gray);
+      padding: 0.5rem 1rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+      border-top: 1px solid var(--primary-purple);
+    }
+    .page-navigation {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      color: var(--light-purple);
+    }
+    .page-btn {
+      background: var(--primary-purple);
+      color: white;
+      border: none;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+    .page-btn:hover:not(:disabled) {
+      background: #7B1FA2;
+    }
+    .page-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .zoom-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--light-purple);
+    }
+    .zoom-btn {
+      background: var(--primary-purple);
+      color: white;
+      border: none;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+    .zoom-btn:hover {
+      background: #7B1FA2;
+    }
+    .zoom-level {
+      min-width: 50px;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 100;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.7);
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-content {
+      background-color: var(--dark-gray);
+      margin: auto;
+      padding: 2rem;
+      border: 1px solid var(--primary-purple);
+      border-radius: 10px;
+      width: 80%;
+      max-width: 500px;
+      position: relative;
+    }
+    .close {
+      position: absolute;
+      right: 1rem;
+      top: 1rem;
+      color: var(--white);
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .close:hover {
+      color: var(--light-purple);
+    }
+    .modal h2 {
+      color: var(--light-purple);
+      margin-bottom: 1.5rem;
+    }
+    .modal input {
+      width: 100%;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid var(--primary-purple);
+      border-radius: 5px;
+      color: white;
+    }
+    .modal button {
+      width: 100%;
+      padding: 0.75rem;
+      background: var(--primary-purple);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-family: var(--font-family);
+      font-weight: 500;
+    }
+    .modal button:hover {
+      background: #7B1FA2;
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--dark-gray);
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      border-left: 4px solid var(--primary-purple);
+      z-index: 1001;
+      opacity: 0;
+      transition: all 0.3s ease;
+      min-width: 250px;
+      text-align: center;
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+    .toast.success {
+      border-left-color: var(--success-green);
+    }
+    .toast.error {
+      border-left-color: var(--danger-red);
+    }
+    .toast.warning {
+      border-left-color: var(--warning-orange);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1200px) {
+      .file-grid {
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      }
+    }
+
+    @media (max-width: 900px) {
+      .sidebar {
+        width: 200px;
+      }
+      .main-content {
+        margin-left: 220px;
+      }
+      .search-bar {
+        max-width: 300px;
+      }
+      .file-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      }
+    }
+
+    @media (max-width: 768px) {
+      .menu-toggle {
+        display: block;
+      }
+      .sidebar {
+        transform: translateX(-100%);
+        width: 250px;
+      }
+      .sidebar.active {
+        transform: translateX(0);
+      }
+      .main-content {
+        margin-left: 0;
+        padding: 1rem;
+      }
+      header {
+        padding: 0.75rem 1rem;
+      }
+      .search-bar {
+        order: 3;
+        flex-basis: 100%;
+        max-width: 100%;
+        margin: 0.5rem 0;
+      }
+      .header-actions {
+        order: 2;
+      }
+      .file-grid {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 1rem;
+      }
+      .file-card {
+        padding: 1rem;
+      }
+      .preview-container {
+        height: 300px;
+      }
+      .fullscreen-header {
+        padding: 0.75rem;
+      }
+      .fullscreen-title {
+        font-size: 1rem;
+      }
+      .fullscreen-controls {
+        gap: 0.5rem;
+      }
+      .fullscreen-btn-control {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+      }
+      .storage-info {
+        bottom: 10px;
+        right: 10px;
+        font-size: 0.7rem;
+      }
+    }
+
+    @media (max-width: 500px) {
+      .logo {
+        font-size: 1.2rem;
+      }
+      .file-grid {
+        grid-template-columns: 1fr;
+      }
+      .modal-content {
+        width: 95%;
+        padding: 1.5rem;
+      }
+      .login-form {
+        width: 90%;
+      }
+      .preview-container {
+        height: 250px;
+      }
+      .doc-nest-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+      }
+      .action-buttons {
+        width: 100%;
+      }
+      .download-btn, .fullscreen-btn {
+        flex: 1;
+        justify-content: center;
+      }
+      .fullscreen-footer {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+      .storage-info {
+        display: none;
+      }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LOADING SCREEN -->
+  <div id="loadingScreen" class="loading-screen">
+    <div class="loading-text">DocsNest</div>
+    <div class="loading-sub">Loading academic resources...</div>
+  </div>
+
+  <!-- LOGIN PAGE -->
+  <div id="loginPage" class="login-container" style="display:none;">
+    <div class="login-form">
+      <h1>DocsNest</h1>
+      <p>Select your role to login:</p>
+
+      <button class="role-btn" onclick="selectRole('student')">Login as Student</button>
+      <button class="role-btn" onclick="selectRole('admin')">Login as Admin</button>
+
+      <div id="adminPasswordDiv" style="display:none;margin-top:1rem;">
+        <input type="password" id="password" placeholder="Enter Admin Password">
+        <button onclick="loginAdmin()">Enter</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- APP -->
+  <div id="appContainer" class="app-container">
+
+    <header>
+      <button class="menu-toggle" id="menuToggle">
+        <i class="fas fa-bars"></i>
+      </button>
+      
+      <div class="logo">Code'n'Go</div>
+      
+      <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Search files..." onkeyup="searchFiles()">
+      </div>
+
+      <div class="header-actions">
+        <button id="uploadBtn" class="upload-btn" style="display:none" onclick="openUploadModal()">
+          <i class="fas fa-upload"></i> Upload
+        </button>
+        <button id="addSubjectBtn" class="upload-btn" style="display:none" onclick="openAddSubjectModal()">
+          <i class="fas fa-plus"></i> Add Subject
+        </button>
+        <button id="removeSubjectBtn" class="upload-btn" style="display:none" onclick="removeSubject()">
+          <i class="fas fa-minus"></i> Remove Subject
+        </button>
+        <button id="clearStorageBtn" class="upload-btn" style="display:none" onclick="clearAllStorage()">
+          <i class="fas fa-trash"></i> Clear Storage
+        </button>
+
+        <div id="profileDisplay" style="color:var(--light-purple)">Guest</div>
+      </div>
+    </header>
+
+    <div class="sidebar" id="sidebar">
+      <h2>Subjects</h2>
+      <div id="subjectList"></div>
+    </div>
+
+    <div class="main-content" id="mainContent">
+      <h2 id="subjectTitle">Select a Subject</h2>
+      <div id="fileGrid" class="file-grid"></div>
+
+      <div class="doc-nest">
+        <div class="doc-nest-header">
+          <h2>Doc Nest</h2>
+          <button id="fullscreenToggleBtn" class="fullscreen-btn" style="display:none;" onclick="openFullscreen()">
+            <i class="fas fa-expand"></i> Fullscreen
+          </button>
+        </div>
+        <div id="docNestViewer">Select a file to preview details here.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STORAGE INFO -->
+  <div id="storageInfo" class="storage-info" style="display:none;">
+    <div><i class="fas fa-database"></i> Storage Used</div>
+    <div id="storageText">0 MB / 500 MB</div>
+    <div class="storage-bar">
+      <div id="storageFill" class="storage-fill" style="width: 0%"></div>
+    </div>
+  </div>
+
+  <!-- FULLSCREEN MODAL -->
+  <div id="fullscreenModal" class="fullscreen-modal">
+    <div class="fullscreen-header">
+      <div class="fullscreen-title">
+        <i id="fullscreenFileIcon" class="fas fa-file"></i>
+        <span id="fullscreenFileName">File Name</span>
+      </div>
+      <div class="fullscreen-controls">
+        <button class="fullscreen-btn-control" onclick="toggleFullscreen()">
+          <i class="fas fa-compress"></i> Exit Fullscreen
+        </button>
+        <button class="close-fullscreen" onclick="closeFullscreen()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+    <div class="fullscreen-content" id="fullscreenContent">
+      <!-- File content will be loaded here -->
+    </div>
+    <div class="fullscreen-footer" id="fullscreenFooter">
+      <div class="page-navigation" id="pageNavigation" style="display:none;">
+        <button class="page-btn" onclick="previousPage()">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <span>Page <span id="currentPage">1</span> of <span id="totalPages">1</span></span>
+        <button class="page-btn" onclick="nextPage()">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+      <div class="zoom-controls" id="zoomControls">
+        <button class="zoom-btn" onclick="zoomOut()">
+          <i class="fas fa-search-minus"></i>
+        </button>
+        <span class="zoom-level" id="zoomLevel">100%</span>
+        <button class="zoom-btn" onclick="zoomIn()">
+          <i class="fas fa-search-plus"></i>
+        </button>
+        <button class="zoom-btn" onclick="resetZoom()">
+          <i class="fas fa-compress"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- UPLOAD MODAL -->
+  <div id="uploadModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeUploadModal()">&times;</span>
+      <h2>Upload File</h2>
+      <input type="text" id="fileNameInput" placeholder="Enter file name">
+      <input type="file" id="fileInput" accept="*/*">
+      <button onclick="uploadFile()">Upload</button>
+    </div>
+  </div>
+
+  <!-- ADD SUBJECT MODAL -->
+  <div id="addSubjectModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeAddSubjectModal()">&times;</span>
+      <h2>Add Subject</h2>
+      <input type="text" id="subjectNameInput" placeholder="Enter subject name">
+      <button onclick="addSubject()">Add Subject</button>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="toast"></div>
+
+<script>
+// IndexedDB setup for file storage
+let db;
+const DB_NAME = 'DocsNestDB';
+const DB_VERSION = 1;
+const STORE_NAME = 'files';
+
+// Initialize IndexedDB
+function initDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => {
+      db = request.result;
+      resolve(db);
+    };
+    
+    request.onupgradeneeded = (event) => {
+      db = event.target.result;
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+      }
+    };
+  });
+}
+
+// File storage functions
+async function storeFileInDB(fileData) {
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([STORE_NAME], 'readwrite');
+    const store = transaction.objectStore(STORE_NAME);
+    const request = store.put(fileData);
+    
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function getFileFromDB(fileId) {
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([STORE_NAME], 'readonly');
+    const store = transaction.objectStore(STORE_NAME);
+    const request = store.get(fileId);
+    
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function deleteFileFromDB(fileId) {
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([STORE_NAME], 'readwrite');
+    const store = transaction.objectStore(STORE_NAME);
+    const request = store.delete(fileId);
+    
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+// Application state
+let mockFiles = {
+  'digital-logic-design': [
+    { name: 'unit-1.pdf', type: 'pdf', date: '2023-10-14', nested: 'Introduction', path: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', isLocal: false },
+    { name: 'unit-2.pdf', type: 'pdf', date: '2023-10-15', nested: 'Boolean Algebra', path: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', isLocal: false },
+    { name: 'sample-image.jpg', type: 'image', date: '2023-10-16', nested: 'Diagrams', path: 'https://picsum.photos/seed/dld/800/600.jpg', isLocal: false }
+  ],
+  'maths': [
+    { name: 'introduction.pdf', type: 'pdf', date: '2023-10-14', nested: 'LA&C', path: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', isLocal: false },
+    { name: 'exercises.pdf', type: 'pdf', date: '2023-10-16', nested: 'Practice', path: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', isLocal: false },
+    { name: 'formula-sheet.png', type: 'image', date: '2023-10-17', nested: 'Reference', path: 'https://picsum.photos/seed/maths/800/600.jpg', isLocal: false }
+  ],
+  'computer-networks': [
+    { name: 'osi-model.pdf', type: 'pdf', date: '2023-10-12', nested: 'OSI Model', path: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', isLocal: false },
+    { name: 'tcp-ip.pdf', type: 'pdf', date: '2023-10-13', nested: 'TCP/IP', path: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', isLocal: false },
+    { name: 'network-demo.mp4', type: 'video', date: '2023-10-18', nested: 'Demo', path: 'https://www.w3schools.com/html/mov_bbb.mp4', isLocal: false }
+  ]
+};
+
+let currentUser = null;
+let currentSubject = null;
+let currentFile = null;
+let currentZoom = 100;
+let currentPage = 1;
+let totalPages = 1;
+
+// Initialize app
+window.onload = async () => {
+  // Initialize IndexedDB
+  await initDB();
+  
+  // Load files from localStorage
+  loadFilesFromStorage();
+  
+  setTimeout(() => {
+    document.getElementById('loadingScreen').style.display = 'none';
+    document.getElementById('loginPage').style.display = 'flex';
+    document.body.style.overflow = 'auto';
+  }, 2000);
+
+  // Setup mobile menu toggle
+  document.getElementById('menuToggle').addEventListener('click', function() {
+    document.getElementById('sidebar').classList.toggle('active');
+  });
+
+  // Setup keyboard shortcuts
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && document.getElementById('fullscreenModal').classList.contains('active')) {
+      closeFullscreen();
+    }
+  });
+};
+
+// Storage functions
+function loadFilesFromStorage() {
+  const storedFiles = localStorage.getItem('docsNestFiles');
+  if (storedFiles) {
+    try {
+      const parsedFiles = JSON.parse(storedFiles);
+      // Merge with default files
+      Object.keys(parsedFiles).forEach(subject => {
+        if (mockFiles[subject]) {
+          mockFiles[subject] = [...mockFiles[subject], ...parsedFiles[subject]];
+        } else {
+          mockFiles[subject] = parsedFiles[subject];
+        }
+      });
+    } catch (e) {
+      console.error('Error loading files from storage:', e);
+    }
+  }
+  updateStorageInfo();
+}
+
+function saveFilesToStorage() {
+  // Only save uploaded files (local files)
+  const localFiles = {};
+  Object.keys(mockFiles).forEach(subject => {
+    const uploaded = mockFiles[subject].filter(file => file.isLocal);
+    if (uploaded.length > 0) {
+      localFiles[subject] = uploaded;
+    }
+  });
+  localStorage.setItem('docsNestFiles', JSON.stringify(localFiles));
+  updateStorageInfo();
+}
+
+async function updateStorageInfo() {
+  if (currentUser === 'admin') {
+    document.getElementById('storageInfo').style.display = 'block';
+    
+    // Calculate storage usage
+    let totalSize = 0;
+    const storedFiles = localStorage.getItem('docsNestFiles');
+    if (storedFiles) {
+      totalSize = new Blob([storedFiles]).size;
+    }
+    
+    // Estimate IndexedDB usage (rough approximation)
+    if ('storage' in navigator && 'estimate' in navigator.storage) {
+      const estimate = await navigator.storage.estimate();
+      totalSize += estimate.usage || 0;
+    }
+    
+    const maxSize = 500 * 1024 * 1024; // 500MB limit (increased from 50MB)
+    const percentage = Math.min((totalSize / maxSize) * 100, 100);
+    
+    document.getElementById('storageText').textContent = `${formatFileSize(totalSize)} / 500 MB`;
+    document.getElementById('storageFill').style.width = percentage + '%';
+    
+    // Change color based on usage
+    const fillElement = document.getElementById('storageFill');
+    if (percentage > 80) {
+      fillElement.style.background = 'var(--danger-red)';
+    } else if (percentage > 60) {
+      fillElement.style.background = 'var(--warning-orange)';
+    } else {
+      fillElement.style.background = 'var(--success-green)';
+    }
+  } else {
+    document.getElementById('storageInfo').style.display = 'none';
+  }
+}
+
+function clearAllStorage() {
+  if (confirm('Are you sure you want to clear all uploaded files? This action cannot be undone.')) {
+    // Clear localStorage
+    localStorage.removeItem('docsNestFiles');
+    
+    // Clear IndexedDB
+    if (db) {
+      const transaction = db.transaction([STORE_NAME], 'readwrite');
+      const store = transaction.objectStore(STORE_NAME);
+      store.clear();
+    }
+    
+    // Reload files
+    location.reload();
+  }
+}
+
+function showToast(message, type = 'success') {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.className = `toast ${type}`;
+  toast.classList.add('show');
+  
+  setTimeout(() => {
+    toast.classList.remove('show');
+  }, 3000);
+}
+
+function getFileIcon(type) {
+  const icons = {
+    'pdf': 'fas fa-file-pdf',
+    'image': 'fas fa-file-image',
+    'jpg': 'fas fa-file-image',
+    'jpeg': 'fas fa-file-image',
+    'png': 'fas fa-file-image',
+    'gif': 'fas fa-file-image',
+    'video': 'fas fa-file-video',
+    'mp4': 'fas fa-file-video',
+    'avi': 'fas fa-file-video',
+    'mov': 'fas fa-file-video',
+    'audio': 'fas fa-file-audio',
+    'mp3': 'fas fa-file-audio',
+    'wav': 'fas fa-file-audio',
+    'doc': 'fas fa-file-word',
+    'docx': 'fas fa-file-word',
+    'ppt': 'fas fa-file-powerpoint',
+    'pptx': 'fas fa-file-powerpoint',
+    'xls': 'fas fa-file-excel',
+    'xlsx': 'fas fa-file-excel',
+    'zip': 'fas fa-file-archive',
+    'rar': 'fas fa-file-archive',
+    'txt': 'fas fa-file-alt',
+    'code': 'fas fa-file-code',
+    'js': 'fas fa-file-code',
+    'html': 'fas fa-file-code',
+    'css': 'fas fa-file-code',
+    'py': 'fas fa-file-code',
+    'java': 'fas fa-file-code',
+    'cpp': 'fas fa-file-code',
+    'c': 'fas fa-file-code'
+  };
+  return icons[type] || 'fas fa-file';
+}
+
+function renderSubjects(){
+  const list = document.getElementById('subjectList');
+  list.innerHTML = '';
+  for(let subject in mockFiles){
+    const div = document.createElement('div');
+    div.className = 'subject-folder';
+    if(subject === currentSubject) {
+      div.classList.add('active');
+    }
+    div.textContent = subject.replace(/-/g,' ').toUpperCase();
+    
+    div.onclick = () => loadSubject(subject, div);
+    list.appendChild(div);
+  }
+}
+
+function selectRole(role){
+  if(role==='student'){
+    currentUser='student';
+    document.getElementById('profileDisplay').textContent='Student View';
+    document.getElementById('loginPage').style.display='none';
+    document.getElementById('appContainer').style.display='block';
+    renderSubjects();
+    updateStorageInfo();
+  } else {
+    document.getElementById('adminPasswordDiv').style.display='block';
+  }
+}
+
+function loginAdmin(){
+  const pass=document.getElementById('password').value;
+  if(pass==='CnG001'){
+    currentUser='admin';
+    document.getElementById('profileDisplay').textContent='Admin Panel';
+    ['uploadBtn','addSubjectBtn','removeSubjectBtn','clearStorageBtn'].forEach(id=>document.getElementById(id).style.display='inline-block');
+    document.getElementById('loginPage').style.display='none';
+    document.getElementById('appContainer').style.display='block';
+    renderSubjects();
+    updateStorageInfo();
+  } else alert('Incorrect password!');
+}
+
+function loadSubject(subject){
+  currentSubject = subject;
+  const grid = document.getElementById('fileGrid');
+  const files = mockFiles[subject] || [];
+  grid.innerHTML='';
+
+  // Close mobile menu after selection
+  if(window.innerWidth <= 768) {
+    document.getElementById('sidebar').classList.remove('active');
+  }
+
+  files.forEach((file, index)=>{
+    const card = document.createElement('div');
+    card.className = 'file-card';
+
+    // Add local indicator for uploaded files
+    if (file.isLocal) {
+      const indicator = document.createElement('div');
+      indicator.className = 'local-indicator';
+      indicator.textContent = 'LOCAL';
+      card.appendChild(indicator);
+    }
+
+    const trash = document.createElement('span');
+    trash.className = 'delete-icon';
+    trash.innerHTML = "<i class='fas fa-trash'></i>";
+    trash.onclick = (e)=>{
+      e.stopPropagation();
+      deleteFile(index);
+    };
+
+    card.innerHTML = `
+      <div class="file-icon">
+        <i class="${getFileIcon(file.type)}"></i>
+      </div>
+      <h3>${file.name}</h3>
+      <p>Type: ${file.type}</p>
+      <p>Category: ${file.nested}</p>
+      <p class="file-date">Date: ${file.date}</p>
+    `;
+    
+    if(currentUser === 'admin') card.appendChild(trash);
+
+    card.onclick = ()=>viewFile(file);
+
+    grid.appendChild(card);
+  });
+
+  document.getElementById('subjectTitle').textContent = subject.replace(/-/g,' ').toUpperCase();
+  
+  // Update active state in sidebar
+  renderSubjects();
+}
+
+async function deleteFile(index){
+  if(currentSubject === null) return;
+  if(confirm("Are you sure you want to delete this file?")){
+    const file = mockFiles[currentSubject][index];
+    
+    // Delete from IndexedDB if it's a local file
+    if (file.isLocal && file.id) {
+      try {
+        await deleteFileFromDB(file.id);
+      } catch (e) {
+        console.error('Error deleting file from DB:', e);
+      }
+    }
+    
+    mockFiles[currentSubject].splice(index, 1);
+    saveFilesToStorage();
+    loadSubject(currentSubject);
+    showToast('File deleted successfully', 'success');
+  }
+}
+
+async function uploadFile(){
+  const name=document.getElementById('fileNameInput').value;
+  const file=document.getElementById('fileInput').files[0];
+  if(!name || !file) {
+    showToast("Please provide both file name and select a file", 'error');
+    return;
+  }
+
+  // Check storage limit
+  const currentStorage = parseInt(localStorage.getItem('docsNestFiles')?.length || 0);
+  if (currentStorage > 400 * 1024 * 1024) { // 400MB limit (increased from 40MB)
+    showToast('Storage limit reached. Please delete some files first.', 'warning');
+    return;
+  }
+
+  // Get file type from extension or MIME type
+  let fileType = file.type.split('/')[1] || 'unknown';
+  if(fileType === 'unknown') {
+    // Try to get from file name extension
+    const extension = name.split('.').pop().toLowerCase();
+    fileType = extension;
+  }
+
+  // Convert file to base64 for storage
+  const reader = new FileReader();
+  reader.onload = async function(e) {
+    const fileId = 'file_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    
+    const newFile = {
+      id: fileId,
+      name,
+      type: fileType,
+      date: new Date().toISOString().split('T')[0],
+      nested: "Uploaded",
+      size: file.size,
+      mimeType: file.type,
+      isLocal: true,
+      data: e.target.result // Base64 data
+    };
+
+    // Store in IndexedDB
+    try {
+      await storeFileInDB(newFile);
+      
+      // Create blob URL for immediate use
+      const blob = new Blob([file], { type: file.type });
+      newFile.path = URL.createObjectURL(blob);
+      
+      // Add to current subject
+      if(!mockFiles[currentSubject]) {
+        mockFiles[currentSubject] = [];
+      }
+      
+      mockFiles[currentSubject].push(newFile);
+      saveFilesToStorage();
+      loadSubject(currentSubject);
+      closeUploadModal();
+      
+      // Reset form
+      document.getElementById('fileNameInput').value = '';
+      document.getElementById('fileInput').value = '';
+      
+      showToast('File uploaded successfully!', 'success');
+    } catch (error) {
+      console.error('Error storing file:', error);
+      showToast('Error uploading file. Please try again.', 'error');
+    }
+  };
+  
+  reader.readAsDataURL(file);
+}
+
+async function viewFile(file){
+  currentFile = file;
+  
+  // If it's a local file, retrieve from IndexedDB if needed
+  if (file.isLocal && file.id && !file.path) {
+    try {
+      const storedFile = await getFileFromDB(file.id);
+      if (storedFile && storedFile.data) {
+        // Create blob URL from stored data
+        const byteCharacters = atob(storedFile.data.split(',')[1]);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: storedFile.mimeType });
+        file.path = URL.createObjectURL(blob);
+      }
+    } catch (e) {
+      console.error('Error retrieving file:', e);
+    }
+  }
+  
+  let viewerContent = '<div class="file-preview">';
+  
+  // File information section
+  viewerContent += `
+    <div class="file-info">
+      <h3><i class="${getFileIcon(file.type)}"></i> ${file.name}</h3>
+      <p><strong>Type:</strong> ${file.type}</p>
+      <p><strong>Category:</strong> ${file.nested}</p>
+      <p><strong>Date:</strong> ${file.date}</p>
+      ${file.size ? `<p><strong>Size:</strong> ${formatFileSize(file.size)}</p>` : ''}
+      ${file.isLocal ? '<p><strong>Storage:</strong> <span style="color: var(--success-green);">Local Storage</span></p>' : ''}
+    </div>
+  `;
+  
+  // Preview section
+  viewerContent += '<div class="preview-container">';
+  
+  if(file.path) {
+    const fileType = file.type.toLowerCase();
+    
+    if(fileType === 'pdf') {
+      viewerContent += `<embed src="${file.path}" width="100%" height="100%" type="application/pdf">`;
+    }
+    else if(['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(fileType)) {
+      viewerContent += `<img src="${file.path}" alt="${file.name}">`;
+    }
+    else if(['mp4', 'webm', 'ogg'].includes(fileType)) {
+      viewerContent += `
+        <video controls width="100%" height="100%">
+          <source src="${file.path}" type="video/${fileType}">
+          Your browser does not support video tag.
+        </video>
+      `;
+    }
+    else if(['mp3', 'wav', 'ogg'].includes(fileType)) {
+      viewerContent += `
+        <div style="text-align: center; width: 100%;">
+          <i class="fas fa-file-audio" style="font-size: 4rem; color: var(--light-purple); margin-bottom: 1rem;"></i>
+          <p style="margin-bottom: 1rem;">Audio File: ${file.name}</p>
+          <audio controls style="width: 80%;">
+            <source src="${file.path}" type="audio/${fileType}">
+            Your browser does not support audio element.
+          </audio>
+        </div>
+      `;
+    }
+    else if(['txt', 'md'].includes(fileType)) {
+      viewerContent += `
+        <iframe src="${file.path}" width="100%" height="100%" style="background: white; color: black; padding: 1rem;">
+        </iframe>
+      `;
+    }
+    else if(['html', 'htm'].includes(fileType)) {
+      viewerContent += `<iframe src="${file.path}" width="100%" height="100%"></iframe>`;
+    }
+    else {
+      viewerContent += `
+        <div class="no-preview">
+          <i class="${getFileIcon(fileType)}"></i>
+          <p>Preview not available for this file type</p>
+          <p style="font-size: 0.9rem; opacity: 0.7;">File type: ${fileType}</p>
+        </div>
+      `;
+    }
+  } else {
+    viewerContent += `
+      <div class="no-preview">
+        <i class="fas fa-file"></i>
+        <p>No preview available</p>
+      </div>
+    `;
+  }
+  
+  viewerContent += '</div>';
+  
+  // Action buttons
+  viewerContent += '<div class="action-buttons">';
+  
+  // Download button for uploaded files
+  if(file.isLocal) {
+    viewerContent += `
+      <button class="download-btn" onclick="downloadLocalFile('${file.id}', '${file.name}')">
+        <i class="fas fa-download"></i> Download
+      </button>
+    `;
+  }
+  
+  // Fullscreen button
+  if(file.path) {
+    viewerContent += `
+      <button class="fullscreen-btn" onclick="openFullscreen()">
+        <i class="fas fa-expand"></i> Fullscreen
+      </button>
+    `;
+  }
+  
+  viewerContent += '</div>';
+  viewerContent += '</div>';
+  
+  document.getElementById('docNestViewer').innerHTML = viewerContent;
+}
+
+async function downloadLocalFile(fileId, fileName) {
+  try {
+    const storedFile = await getFileFromDB(fileId);
+    if (storedFile && storedFile.data) {
+      const a = document.createElement('a');
+      a.href = storedFile.data;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      showToast('Download started', 'success');
+    }
+  } catch (e) {
+    console.error('Error downloading file:', e);
+    showToast('Error downloading file', 'error');
+  }
+}
+
+function openFullscreen() {
+  if (!currentFile || !currentFile.path) return;
+  
+  const modal = document.getElementById('fullscreenModal');
+  const content = document.getElementById('fullscreenContent');
+  const fileName = document.getElementById('fullscreenFileName');
+  const fileIcon = document.getElementById('fullscreenFileIcon');
+  
+  // Set file info
+  fileName.textContent = currentFile.name;
+  fileIcon.className = getFileIcon(currentFile.type);
+  
+  // Reset zoom
+  currentZoom = 100;
+  updateZoomLevel();
+  
+  // Load content based on file type
+  const fileType = currentFile.type.toLowerCase();
+  content.innerHTML = '';
+  
+  if(fileType === 'pdf') {
+    content.innerHTML = `<embed id="fullscreenEmbed" src="${currentFile.path}" type="application/pdf" style="width: 100%; height: 100%;">`;
+    document.getElementById('pageNavigation').style.display = 'flex';
+    document.getElementById('zoomControls').style.display = 'flex';
+  }
+  else if(['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(fileType)) {
+    content.innerHTML = `<img id="fullscreenImage" src="${currentFile.path}" alt="${currentFile.name}" style="transform: scale(1); transition: transform 0.3s ease;">`;
+    document.getElementById('pageNavigation').style.display = 'none';
+    document.getElementById('zoomControls').style.display = 'flex';
+  }
+  else if(['mp4', 'webm', 'ogg'].includes(fileType)) {
+    content.innerHTML = `
+      <video id="fullscreenVideo" controls style="width: 100%; height: 100%;">
+        <source src="${currentFile.path}" type="video/${fileType}">
+        Your browser does not support the video tag.
+      </video>
+    `;
+    document.getElementById('pageNavigation').style.display = 'none';
+    document.getElementById('zoomControls').style.display = 'none';
+  }
+  else if(['mp3', 'wav', 'ogg'].includes(fileType)) {
+    content.innerHTML = `
+      <div style="text-align: center; width: 100%;">
+        <i class="fas fa-file-audio" style="font-size: 5rem; color: var(--light-purple); margin-bottom: 2rem;"></i>
+        <h2 style="color: var(--light-purple); margin-bottom: 2rem;">${currentFile.name}</h2>
+        <audio controls style="width: 80%; max-width: 500px;">
+          <source src="${currentFile.path}" type="audio/${fileType}">
+          Your browser does not support the audio element.
+        </audio>
+      </div>
+    `;
+    document.getElementById('pageNavigation').style.display = 'none';
+    document.getElementById('zoomControls').style.display = 'none';
+  }
+  else if(['txt', 'md', 'html', 'htm'].includes(fileType)) {
+    content.innerHTML = `<iframe id="fullscreenIframe" src="${currentFile.path}" style="width: 100%; height: 100%; background: white;"></iframe>`;
+    document.getElementById('pageNavigation').style.display = 'none';
+    document.getElementById('zoomControls').style.display = 'flex';
+  }
+  else {
+    content.innerHTML = `
+      <div class="no-preview">
+        <i class="${getFileIcon(fileType)}" style="font-size: 5rem;"></i>
+        <h2>${currentFile.name}</h2>
+        <p>Cannot preview this file type in fullscreen</p>
+        <p style="font-size: 0.9rem; opacity: 0.7;">File type: ${fileType}</p>
+      </div>
+    `;
+    document.getElementById('pageNavigation').style.display = 'none';
+    document.getElementById('zoomControls').style.display = 'none';
+  }
+  
+  // Show modal
+  modal.classList.add('active');
+  
+  // Try to enter browser fullscreen
+  if (modal.requestFullscreen) {
+    modal.requestFullscreen();
+  } else if (modal.webkitRequestFullscreen) { /* Safari */
+    modal.webkitRequestFullscreen();
+  } else if (modal.msRequestFullscreen) { /* IE11 */
+    modal.msRequestFullscreen();
+  }
+}
+
+function closeFullscreen() {
+  const modal = document.getElementById('fullscreenModal');
+  modal.classList.remove('active');
+  
+  // Exit browser fullscreen
+  if (document.exitFullscreen) {
+    document.exitFullscreen();
+  } else if (document.webkitExitFullscreen) { /* Safari */
+    document.webkitExitFullscreen();
+  } else if (document.msExitFullscreen) { /* IE11 */
+    document.msExitFullscreen();
+  }
+}
+
+function toggleFullscreen() {
+  if (document.fullscreenElement) {
+    closeFullscreen();
+  } else {
+    openFullscreen();
+  }
+}
+
+function zoomIn() {
+  if (currentZoom < 200) {
+    currentZoom += 25;
+    applyZoom();
+  }
+}
+
+function zoomOut() {
+  if (currentZoom > 25) {
+    currentZoom -= 25;
+    applyZoom();
+  }
+}
+
+function resetZoom() {
+  currentZoom = 100;
+  applyZoom();
+}
+
+function updateZoomLevel() {
+  document.getElementById('zoomLevel').textContent = currentZoom + '%';
+}
+
+function applyZoom() {
+  updateZoomLevel();
+  const scale = currentZoom / 100;
+  
+  const image = document.getElementById('fullscreenImage');
+  if (image) {
+    image.style.transform = `scale(${scale})`;
+  }
+  
+  const embed = document.getElementById('fullscreenEmbed');
+  if (embed) {
+    embed.style.transform = `scale(${scale})`;
+    embed.style.transformOrigin = 'center center';
+  }
+  
+  const iframe = document.getElementById('fullscreenIframe');
+  if (iframe) {
+    iframe.style.transform = `scale(${scale})`;
+    iframe.style.transformOrigin = 'center center';
+  }
+}
+
+function previousPage() {
+  if (currentPage > 1) {
+    currentPage--;
+    document.getElementById('currentPage').textContent = currentPage;
+    // Note: Actual PDF page navigation would require PDF.js integration
+  }
+}
+
+function nextPage() {
+  if (currentPage < totalPages) {
+    currentPage++;
+    document.getElementById('currentPage').textContent = currentPage;
+    // Note: Actual PDF page navigation would require PDF.js integration
+  }
+}
+
+function formatFileSize(bytes) {
+  if(bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+function downloadFile(fileName, fileUrl) {
+  const a = document.createElement('a');
+  a.href = fileUrl;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+function searchFiles() {
+  const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+  
+  if(!currentSubject) return;
+  
+  const files = mockFiles[currentSubject] || [];
+  const grid = document.getElementById('fileGrid');
+  grid.innerHTML = '';
+  
+  const filteredFiles = files.filter(file => 
+    file.name.toLowerCase().includes(searchTerm) || 
+    file.nested.toLowerCase().includes(searchTerm)
+  );
+  
+  if(filteredFiles.length === 0) {
+    grid.innerHTML = '<p style="opacity: 0.7; grid-column: 1/-1;">No files found matching your search.</p>';
+    return;
+  }
+  
+  filteredFiles.forEach((file, index) => {
+    const originalIndex = files.indexOf(file);
+    const card = document.createElement('div');
+    card.className = 'file-card';
+
+    // Add local indicator for uploaded files
+    if (file.isLocal) {
+      const indicator = document.createElement('div');
+      indicator.className = 'local-indicator';
+      indicator.textContent = 'LOCAL';
+      card.appendChild(indicator);
+    }
+
+    const trash = document.createElement('span');
+    trash.className = 'delete-icon';
+    trash.innerHTML = "<i class='fas fa-trash'></i>";
+    trash.onclick = (e) => {
+      e.stopPropagation();
+      deleteFile(originalIndex);
+    };
+
+    card.innerHTML = `
+      <div class="file-icon">
+        <i class="${getFileIcon(file.type)}"></i>
+      </div>
+      <h3>${file.name}</h3>
+      <p>Type: ${file.type}</p>
+      <p>Category: ${file.nested}</p>
+      <p class="file-date">Date: ${file.date}</p>
+    `;
+    
+    if(currentUser === 'admin') card.appendChild(trash);
+
+    card.onclick = () => viewFile(file);
+
+    grid.appendChild(card);
+  });
+}
+
+function openUploadModal(){ 
+  if(!currentSubject) {
+    showToast("Please select a subject first", 'warning');
+    return;
+  }
+  document.getElementById('uploadModal').style.display="flex";
+}
+
+function closeUploadModal(){
+  document.getElementById('uploadModal').style.display="none";
+}
+
+function openAddSubjectModal() {
+  document.getElementById('addSubjectModal').style.display="flex";
+}
+
+function closeAddSubjectModal() {
+  document.getElementById('addSubjectModal').style.display="none";
+}
+
+function addSubject() {
+  const subjectName = document.getElementById('subjectNameInput').value.trim();
+  if(!subjectName) {
+    showToast("Please enter a subject name", 'error');
+    return;
+  }
+  
+  // Convert to lowercase and replace spaces with hyphens for key
+  const subjectKey = subjectName.toLowerCase().replace(/\s+/g, '-');
+  
+  if(mockFiles[subjectKey]) {
+    showToast("Subject already exists", 'warning');
+    return;
+  }
+  
+  mockFiles[subjectKey] = [];
+  saveFilesToStorage();
+  renderSubjects();
+  closeAddSubjectModal();
+  
+  // Reset form
+  document.getElementById('subjectNameInput').value = '';
+  
+  // Load: newly added subject
+  loadSubject(subjectKey);
+  showToast('Subject added successfully', 'success');
+}
+
+function removeSubject() {
+  if(!currentSubject) {
+    showToast("Please select a subject first", 'warning');
+    return;
+  }
+  
+  if(confirm(`Are you sure you want to remove the subject "${currentSubject.replace(/-/g, ' ').toUpperCase()}" and all its files?`)) {
+    // Delete local files from IndexedDB
+    const filesToDelete = mockFiles[currentSubject].filter(file => file.isLocal);
+    filesToDelete.forEach(async file => {
+      if (file.id) {
+        try {
+          await deleteFileFromDB(file.id);
+        } catch (e) {
+          console.error('Error deleting file from DB:', e);
+        }
+      }
+    });
+    
+    delete mockFiles[currentSubject];
+    currentSubject = null;
+    saveFilesToStorage();
+    renderSubjects();
+    document.getElementById('subjectTitle').textContent = 'Select a Subject';
+    document.getElementById('fileGrid').innerHTML = '';
+    document.getElementById('docNestViewer').innerHTML = 'Select a file to preview details here.';
+    showToast('Subject removed successfully', 'success');
+  }
+}
+
+</script>
+</body>
+</html>
