@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DocsNest - AI Document Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app-loading" class="app-loading">
+        <div class="loading-card glass-panel">
+            <div class="loading-spinner"></div>
+            <p>Connecting to database…</p>
+        </div>
+    </div>
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Modals -->
+    <div id="doc-modal" class="modal hidden">
+        <div class="modal-content glass-panel">
+            <div class="modal-header">
+                <h3 id="modal-doc-title">Document Preview</h3>
+                <button class="close-btn" onclick="closeModal('doc-modal')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" id="modal-doc-body">
+                <!-- Doc content renders here -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="openAIToolsFromModal()"><i class="fas fa-robot"></i> AI Summary</button>
+                <button class="btn btn-primary"><i class="fas fa-download"></i> Download</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Authentication View -->
+    <main id="auth-view" class="view active">
+        <div class="auth-container glass-panel">
+            <div class="auth-brand">
+                <i class="fas fa-feather-alt logo-icon"></i>
+                <h2>DocsNest</h2>
+                <p>Your AI-Powered Productivity Space</p>
+            </div>
+            
+            <div class="auth-tabs">
+                <button class="tab-btn active" onclick="switchAuthTab('user')">User Login</button>
+                <button class="tab-btn" onclick="switchAuthTab('admin')">Admin Login</button>
+            </div>
+
+            <form id="login-form" class="auth-form" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>Username / Email</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="login-username" placeholder="Username created by admin" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="login-password" placeholder="Enter password" required>
+                    </div>
+                </div>
+                <div id="auth-error" class="error-text hidden"></div>
+                
+                <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+            </form>
+        </div>
+        <div class="bg-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+        </div>
+    </main>
+
+    <!-- Main Dashboard View -->
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+    <main id="main-view" class="view hidden">
+        <nav class="sidebar glass-panel">
+            <div class="sidebar-header">
+                <i class="fas fa-feather-alt logo-icon"></i>
+                <h2>DocsNest</h2>
+            </div>
+            <ul class="nav-links">
+                <li class="nav-item active" onclick="navigateTo('dashboard')">
+                    <i class="fas fa-chart-pie"></i> <span>Dashboard</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('documents')">
+                    <i class="fas fa-folder-open"></i> <span>Documents</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('ai-tools')">
+                    <i class="fas fa-robot"></i> <span>AI Tools</span>
+                </li>
+                <li class="nav-item hidden" id="nav-admin" onclick="navigateTo('admin')">
+                    <i class="fas fa-shield-alt"></i> <span>Admin Panel</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('settings')">
+                    <i class="fas fa-cog"></i> <span>Settings</span>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <button class="btn btn-outline btn-block" onclick="handleLogout()">
+                    <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+                </button>
+            </div>
+        </nav>
+
+        <div class="content-area">
+            <header class="topbar glass-panel">
+                <button class="menu-toggle" type="button" id="menu-toggle" onclick="toggleSidebar()" aria-label="Open menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search documents, text, tags...">
+                </div>
+                <div class="topbar-actions">
+                    <button class="icon-btn"><i class="fas fa-bell"></i></button>
+                    <div class="user-profile">
+                        <div class="avatar"><i class="fas fa-user-astronaut"></i></div>
+                        <span id="current-username">User</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="pages-container">
+                <!-- Dashboard Page -->
+                <section id="page-dashboard" class="page active dashboard-3col">
+                    <!-- Column 1: Welcome & Recent Docs -->
+                    <div class="dash-col dash-left">
+                        <div class="page-header dash-header">
+                            <h2>Welcome back, <span id="dash-username">User</span>! 👋</h2>
+                            <p>Here's what's happening with your documents today.</p>
+                        </div>
+                        <div class="widget glass-panel recent-docs">
+                            <h3>Recent Documents</h3>
+                            <div class="doc-list" id="recent-docs-list">
+                                <!-- Populated by JS -->
+                            </div>
+                            <!-- Empty State UI -->
+                            <div class="empty-state hidden" id="recent-docs-empty">
+                                <div class="empty-icon"><i class="fas fa-folder-open"></i></div>
+                                <h4>No documents yet</h4>
+                                <p>Upload a document to get started.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Column 2: Stats Cards -->
+                    <div class="dash-col dash-middle stats-vertical">
+                        <div class="stat-card glass-panel">
+                            <div class="stat-icon"><i class="fas fa-file-alt"></i></div>
+                            <div class="stat-info">
+                                <h3>Total Documents</h3>
+                                <p id="stat-total-docs">12</p>
+                            </div>
+                        </div>
+                        <div class="stat-card glass-panel">
+                            <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                            <div class="stat-info">
+                                <h3>Reading Time</h3>
+                                <p>4.5 hrs</p>
+                            </div>
+                        </div>
+                        <div class="stat-card glass-panel">
+                            <div class="stat-icon"><i class="fas fa-bolt"></i></div>
+                            <div class="stat-info">
+                                <h3>AI Interactions</h3>
+                                <p>28</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Column 3: Insights -->
+                    <div class="dash-col dash-right">
+                        <div class="widget glass-panel ai-insights">
+                            <h3>Weekly Insights</h3>
+                            <div class="insight-content">
+                                <p><i class="fas fa-check-circle"></i> You reviewed the 'Machine Learning Basics' document thoroughly.</p>
+                                <p><i class="fas fa-lightbulb"></i> Tip: Generate flashcards from your History notes!</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Documents Page -->
+                <section id="page-documents" class="page hidden">
+                    <div class="page-header flex-header">
+                        <div>
+                            <h2>Documents</h2>
+                            <p>Manage and view your files.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="toolbar glass-panel" style="flex-direction: column; align-items: stretch; gap: 15px;">
+                        <div class="toolbar-row">
+                            <div class="filters">
+                                <button class="filter-btn active">All</button>
+                                <button class="filter-btn">PDFs</button>
+                                <button class="filter-btn">Notes</button>
+                            </div>
+                            <div class="view-toggle">
+                                <button class="icon-btn active"><i class="fas fa-th-large"></i></button>
+                                <button class="icon-btn"><i class="fas fa-list"></i></button>
+                            </div>
+                        </div>
+                        <div class="doc-filters-row">
+                            <select id="user-filter-college" class="stepper-input stepper-select" style="min-height: 40px; padding: 8px 30px 8px 12px; width: auto; font-size: 0.9rem;" onchange="renderUserFilterBranchSelect()">
+                                <option value="all">All Colleges</option>
+                            </select>
+                            <select id="user-filter-branch" class="stepper-input stepper-select" style="min-height: 40px; padding: 8px 30px 8px 12px; width: auto; font-size: 0.9rem;" onchange="renderUserFilterSectionSelect()">
+                                <option value="all">All Branches</option>
+                            </select>
+                            <select id="user-filter-section" class="stepper-input stepper-select" style="min-height: 40px; padding: 8px 30px 8px 12px; width: auto; font-size: 0.9rem;" onchange="renderDocuments()">
+                                <option value="all">All Sections</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="documents-grid" id="documents-container">
+                        <!-- Documents injected here via JS -->
+                    </div>
+                </section>
+
+                <!-- AI Tools Page -->
+                <section id="page-ai-tools" class="page hidden">
+                    <div class="page-header">
+                        <h2>AI Workspace <span class="badge premium">Smart</span></h2>
+                        <p>Interact with your documents using AI.</p>
+                    </div>
+                    <div class="ai-layout">
+                        <div class="ai-sidebar glass-panel" id="ai-tools-sidebar">
+                            <h3>Tools</h3>
+                            <button class="tool-btn active" onclick="setAITool('summarize', event)"><i class="fas fa-align-left"></i> Summarizer</button>
+                            <button class="tool-btn" onclick="setAITool('qa', event)"><i class="fas fa-comments"></i> Q&A Chat</button>
+                            <button class="tool-btn" onclick="setAITool('flashcards', event)"><i class="fas fa-layer-group"></i> Flashcards</button>
+                            <button class="tool-btn" onclick="setAITool('extract', event)"><i class="fas fa-key"></i> Key Extract</button>
+                        </div>
+                        <div class="ai-main glass-panel">
+                            <div class="ai-header">
+                                <select class="doc-select glass-input">
+                                    <option>Select a document to analyze...</option>
+                                    <option>Machine Learning Notes.pdf</option>
+                                    <option>Project Proposal.docx</option>
+                                </select>
+                            </div>
+                            <div class="ai-chat-area" id="ai-chat-box">
+                                <div class="ai-message system">
+                                    <div class="avatar"><i class="fas fa-robot"></i></div>
+                                    <div class="msg-content">Hello! Select a document and let me know what you'd like to do. I can summarize it, answer questions, or generate study notes.</div>
+                                </div>
+                            </div>
+                            <div class="ai-input-area">
+                                <input type="text" id="ai-chat-input" placeholder="Ask something about the document..." class="glass-input" onkeypress="handleAIKeyPress(event)">
+                                <button id="ai-send-btn" class="btn btn-primary" onclick="handleAISend()"><i class="fas fa-paper-plane"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Admin Panel Page -->
+                <section id="page-admin" class="page hidden">
+                    <div class="page-header">
+                        <h2>Admin Dashboard</h2>
+                        <p>System controls and user management.</p>
+                    </div>
+                    
+                    <div class="admin-task-selector form-group" style="margin-bottom: 2rem;">
+                        <label class="stepper-field-label">Select Admin Task</label>
+                        <select class="stepper-input stepper-select" id="admin-task-select" onchange="switchAdminTab(this.value)">
+                            <option value="users">Manage Users</option>
+                            <option value="docs">Global Documents</option>
+                            <option value="structure">Manage Structure</option>
+                            <option value="security">Security</option>
+                        </select>
+                    </div>
+
+                    <div id="admin-users-view" class="admin-view active">
+                        <div class="glass-panel admin-card" style="margin-bottom: 1.5rem; max-width: none;">
+                            <h3>Create user</h3>
+                            <p class="text-muted">Passwords are hashed with PBKDF2 before they are saved. Only admin can create or reset them.</p>
+                            <form id="create-user-form" onsubmit="handleCreateUser(event)" class="mt-4">
+                                <div class="form-group">
+                                    <label>Username</label>
+                                    <input type="text" id="new-user-username" class="glass-input" required minlength="3" autocomplete="off">
+                                </div>
+                                <div class="form-group">
+                                    <label>Password (min 8 characters)</label>
+                                    <input type="password" id="new-user-password" class="glass-input" required minlength="8" autocomplete="new-password">
+                                </div>
+                                <button type="submit" class="btn btn-primary">Create user</button>
+                            </form>
+                        </div>
+                        <div class="glass-panel table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>User</th>
+                                        <th>Role</th>
+                                        <th>Docs Count</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="users-table-body">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="admin-docs-view" class="admin-view hidden">
+                        <div class="glass-panel admin-card mb-4" style="margin-bottom: 2rem;">
+                            <h3>Upload Document to Section</h3>
+                            <form id="admin-upload-form" onsubmit="handleAdminUpload(event)" class="mt-4">
+                                <div class="form-group">
+                                    <label>Select College</label>
+                                    <select id="upload-college-select" class="glass-input" required onchange="renderUploadBranchSelect()">
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Select Branch</label>
+                                    <select id="upload-branch-select" class="glass-input" required onchange="renderUploadSectionSelect()">
+                                    </select>
+                                </div>
+                                <div class="form-group" style="display: flex; align-items: center; justify-content: space-between;">
+                                    <div style="flex: 1; padding-right: 1rem;">
+                                        <label>Select Section</label>      
+                                        <select id="upload-section-select" class="glass-input" required>
+                                        </select>
+                                    </div>
+                                    <div style="padding-top: 20px;">
+                                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-muted);">
+                                            <input type="checkbox" id="upload-all-sections" onchange="toggleUploadSectionSelect()">
+                                            All Sections
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>File</label>
+                                    <input type="file" id="admin-file-upload" class="glass-input" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary"><i class="fas fa-upload"></i> Upload</button>
+                            </form>
+                        </div>
+                        <div class="glass-panel admin-card">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 15px;">
+                                <h3>Global Documents</h3>
+                                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                    <select id="filter-college" class="stepper-input stepper-select" style="min-height: 40px; padding: 8px 30px 8px 12px; width: auto; font-size: 0.9rem;" onchange="renderFilterBranchSelect()">
+                                        <option value="all">All Colleges</option>
+                                    </select>
+                                    <select id="filter-branch" class="stepper-input stepper-select" style="min-height: 40px; padding: 8px 30px 8px 12px; width: auto; font-size: 0.9rem;" onchange="renderFilterSectionSelect()">
+                                        <option value="all">All Branches</option>
+                                    </select>
+                                    <select id="filter-section" class="stepper-input stepper-select" style="min-height: 40px; padding: 8px 30px 8px 12px; width: auto; font-size: 0.9rem;" onchange="renderAdminDocs()">
+                                        <option value="all">All Sections</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="documents-grid" id="admin-docs-container">
+                                <!-- Docs populated here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="admin-structure-view" class="admin-view hidden">
+                        <div class="structure-layout">
+
+                            <!-- LEFT: Stepper Panel (40%) -->
+                            <div class="stepper-panel glass-panel">
+                                <div class="stepper-header">
+                                    <h3><i class="fas fa-sitemap"></i> Setup Structure</h3>
+                                    <p class="text-muted">Follow the steps to build your hierarchy</p>
+                                </div>
+
+                                <!-- Step 1: College -->
+                                <div class="stepper-step active" id="step-1">
+                                    <div class="step-indicator">
+                                        <div class="step-circle" id="step-circle-1">
+                                            <span class="step-num">1</span>
+                                            <i class="fas fa-check step-check hidden"></i>
+                                        </div>
+                                        <div class="step-line"></div>
+                                    </div>
+                                    <div class="step-body">
+                                        <div class="step-head" onclick="activateStep(1)">
+                                            <div class="step-title-row">
+                                                <span class="step-label">Step 1</span>
+                                                <h4 class="step-title"><i class="fas fa-university"></i> Create College</h4>
+                                            </div>
+                                            <p class="step-desc">Add a new college or institution to get started.</p>
+                                        </div>
+                                        <div class="step-content" id="step-content-1">
+                                            <div class="stepper-field-group">
+                                                <label class="stepper-field-label">College Name</label>
+                                                <input type="text" id="stepper-college-name" class="stepper-input"
+                                                    placeholder="Enter college name, e.g. Engineering College"
+                                                    oninput="validateStepperInput('stepper-college-name','btn-college','err-college')"
+                                                    onkeypress="if(event.key==='Enter'){stepperAddCollege();}">
+                                                <div class="step-inline-error hidden" id="err-college">
+                                                    <i class="fas fa-exclamation-circle"></i> Please enter a college name.
+                                                </div>
+                                                <button class="btn btn-primary stepper-action-btn" id="btn-college"
+                                                    onclick="stepperAddCollege()" disabled>
+                                                    <i class="fas fa-arrow-right"></i> Add College &amp; Next Step
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Step 2: Branch -->
+                                <div class="stepper-step locked" id="step-2">
+                                    <div class="step-indicator">
+                                        <div class="step-circle" id="step-circle-2">
+                                            <span class="step-num">2</span>
+                                            <i class="fas fa-check step-check hidden"></i>
+                                        </div>
+                                        <div class="step-line"></div>
+                                    </div>
+                                    <div class="step-body">
+                                        <div class="step-head" onclick="activateStep(2)">
+                                            <div class="step-title-row">
+                                                <span class="step-label">Step 2</span>
+                                                <h4 class="step-title"><i class="fas fa-code-branch"></i> Create Branch</h4>
+                                            </div>
+                                            <p class="step-desc">Add a department or branch under a college.</p>
+                                        </div>
+                                        <div class="step-content hidden" id="step-content-2">
+                                            <div class="stepper-field-group">
+                                                <label class="stepper-field-label">Select College</label>
+                                                <select id="stepper-branch-college" class="stepper-input stepper-select"
+                                                    oninput="validateStepperInput('stepper-branch-name','btn-branch','err-branch')">
+                                                </select>
+                                            </div>
+                                            <div class="stepper-field-group">
+                                                <label class="stepper-field-label">Branch Name</label>
+                                                <input type="text" id="stepper-branch-name" class="stepper-input"
+                                                    placeholder="Enter branch name, e.g. Computer Science"
+                                                    oninput="validateStepperInput('stepper-branch-name','btn-branch','err-branch')"
+                                                    onkeypress="if(event.key==='Enter'){stepperAddBranch();}">
+                                                <div class="step-inline-error hidden" id="err-branch">
+                                                    <i class="fas fa-exclamation-circle"></i> Please enter a branch name.
+                                                </div>
+                                                <button class="btn btn-primary stepper-action-btn" id="btn-branch"
+                                                    onclick="stepperAddBranch()" disabled>
+                                                    <i class="fas fa-arrow-right"></i> Add Branch &amp; Next Step
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Step 3: Section -->
+                                <div class="stepper-step locked" id="step-3">
+                                    <div class="step-indicator">
+                                        <div class="step-circle" id="step-circle-3">
+                                            <span class="step-num">3</span>
+                                            <i class="fas fa-check step-check hidden"></i>
+                                        </div>
+                                    </div>
+                                    <div class="step-body">
+                                        <div class="step-head" onclick="activateStep(3)">
+                                            <div class="step-title-row">
+                                                <span class="step-label">Step 3</span>
+                                                <h4 class="step-title"><i class="fas fa-layer-group"></i> Create Section</h4>
+                                            </div>
+                                            <p class="step-desc">Add sections or semesters within a branch.</p>
+                                        </div>
+                                        <div class="step-content hidden" id="step-content-3">
+                                            <div class="stepper-field-group">
+                                                <label class="stepper-field-label">Select College</label>
+                                                <select id="stepper-section-college" class="stepper-input stepper-select"
+                                                    onchange="stepperSectionCollegeChange()">
+                                                </select>
+                                            </div>
+                                            <div class="stepper-field-group">
+                                                <label class="stepper-field-label">Select Branch</label>
+                                                <select id="stepper-section-branch" class="stepper-input stepper-select"
+                                                    oninput="validateStepperInput('stepper-section-name','btn-section','err-section')">
+                                                </select>
+                                            </div>
+                                            <div class="stepper-field-group">
+                                                <label class="stepper-field-label">Section Name</label>
+                                                <input type="text" id="stepper-section-name" class="stepper-input"
+                                                    placeholder="Enter section name, e.g. Semester 1 / Section A"
+                                                    oninput="validateStepperInput('stepper-section-name','btn-section','err-section')"
+                                                    onkeypress="if(event.key==='Enter'){stepperAddSection();}">
+                                                <div class="step-inline-error hidden" id="err-section">
+                                                    <i class="fas fa-exclamation-circle"></i> Please enter a section name.
+                                                </div>
+                                                <button class="btn btn-primary stepper-action-btn" id="btn-section"
+                                                    onclick="stepperAddSection()" disabled>
+                                                    <i class="fas fa-check"></i> Add Section &amp; Finish
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="stepper-footer">
+                                    <button class="btn btn-outline btn-block" onclick="resetStepper()">
+                                        <i class="fas fa-redo"></i> Start Over / Reset Steps
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- RIGHT: Hierarchical Tree Panel (60%) -->
+                            <div class="tree-panel glass-panel">
+                                <div class="tree-header">
+                                    <div class="tree-header-top">
+                                        <div>
+                                            <h3><i class="fas fa-project-diagram"></i> Structure Overview</h3>
+                                            <p class="text-muted">Your complete college hierarchy</p>
+                                        </div>
+                                        <div id="tree-counts" class="tree-stats"></div>
+                                    </div>
+                                </div>
+                                <div id="structure-tree" class="structure-tree">
+                                    <!-- Rendered by JS -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hidden legacy lists for JS backward compatibility -->
+                        <ul id="admin-sections-list" style="display:none;"></ul>
+                        <ul id="admin-branches-list" style="display:none;"></ul>
+                        <ul id="admin-colleges-list" style="display:none;"></ul>
+                        <!-- Legacy selects for upload form backward compat -->
+                        <select id="section-college-select" style="display:none;" onchange="renderSectionBranchSelect()"></select>
+                        <select id="section-branch-select" style="display:none;"></select>
+                        <select id="branch-college-select" style="display:none;"></select>
+                    </div>
+
+                    <div id="admin-security-view" class="admin-view hidden">
+                        <div class="glass-panel admin-card">
+                            <h3>Change Admin Password</h3>
+                            <p class="text-muted">Only a signed-in admin can change this. The new password is hashed (PBKDF2) in the database — never stored as plain text.</p>
+                            <form id="admin-password-form" onsubmit="handleAdminPasswordChange(event)" class="mt-4">
+                                <div class="form-group">
+                                    <label>Current Admin Password</label>
+                                    <input type="password" id="current-admin-pass" class="glass-input" required minlength="8" autocomplete="current-password">
+                                </div>
+                                <div class="form-group">
+                                    <label>New Admin Password</label>
+                                    <input type="password" id="new-admin-pass" class="glass-input" required minlength="8" autocomplete="new-password">
+                                </div>
+                                <div class="form-group">
+                                    <label>Confirm New Password</label>
+                                    <input type="password" id="confirm-admin-pass" class="glass-input" required minlength="8" autocomplete="new-password">
+                                </div>
+                                <div id="pass-change-msg"></div>
+                                <button type="submit" class="btn btn-primary">Update Password</button>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Settings Page -->
+                <section id="page-settings" class="page hidden">
+                    <div class="page-header">
+                        <h2>Settings</h2>
+                    </div>
+                    <div class="settings-grid">
+                        <div class="glass-panel setting-card">
+                            <h3>Appearance</h3>
+                            <div class="setting-item">
+                                <span>Dark Mode</span>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                            <div class="setting-item">
+                                <span>Animations</span>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
