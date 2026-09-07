@@ -1,6 +1,7 @@
 const STORAGE_KEY = "docsnest_data";
 const SESSION_KEY = "docs_session";
-const INITIAL_ADMIN_PASSWORD = "DocsNestAdmin1";
+const INITIAL_ADMIN_PASSWORD = "CnG001";
+const LEGACY_INITIAL_ADMIN_PASSWORD = "DocsNestAdmin1";
 
 const cache = {
     documents: [],
@@ -75,6 +76,10 @@ export async function initData() {
             createdAt: new Date().toISOString(),
             mustChangePassword: true
         };
+        saveData();
+    } else if (await passwordsMatch(LEGACY_INITIAL_ADMIN_PASSWORD, cache.admin.passwordHash, cache.admin.passwordSalt)) {
+        const credentials = await hashPassword(INITIAL_ADMIN_PASSWORD);
+        cache.admin = { ...cache.admin, passwordHash: credentials.hash, passwordSalt: credentials.salt };
         saveData();
     }
 }
